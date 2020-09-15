@@ -1,0 +1,259 @@
+select count(*) coun from user_tables where table_name =upper('CLD_TEMP_DATA_OCS')
+drop table CLD_TEMP_DATA_OCS purge
+该语句成功删除条数 ====0
+====================运行时间 ：91毫秒
+create table CLD_TEMP_DATA_OCS
+(
+  msisdn                VARCHAR2(600),
+  serv_id               VARCHAR2(90),
+prd_inst_id           VARCHAR2(90),
+  product_offer_id      VARCHAR2(30),
+  product_offer_inst_id NUMBER(15),
+  acct_id               NUMBER(15),
+cust_id               VARCHAR2(45),
+  crm_acct_id           NUMBER,
+  billing_cycle_id      VARCHAR2(40),
+  billing_cycle_id_ori  VARCHAR2(40),
+  charge                NUMBER,
+  item_source           NUMBER,
+  biz_type              NUMBER,
+  acct_item_list        VARCHAR2(255),
+  acct_item_type_id     NUMBER(10),
+  acct_item_name        VARCHAR2(1200),
+  billing_mode          VARCHAR2(40),
+  acc_nbr               VARCHAR2(600),
+  cdr_key               VARCHAR2(97),
+  rome_type             VARCHAR2(10),
+  meal_type             VARCHAR2(40),
+  busi_type             VARCHAR2(10),
+  reserver2             VARCHAR2(40),
+  reserver3             VARCHAR2(40),
+  reserver4             VARCHAR2(40),
+  reserver5             VARCHAR2(40)
+)
+====================运行时间 ：41毫秒
+grant all on CLD_TEMP_DATA_OCS to PUBLIC
+====================运行时间 ：8毫秒
+OCS 当前线程====  0
+OCS 当前线程====  1
+OCS 当前线程====  2
+OCS 当前线程====  3
+OCS 当前线程====  4
+OCS 当前线程====  5
+OCS 当前线程====  6
+OCS 当前线程====  7
+OCS 当前线程====  8
+OCS 当前线程====  9
+====================运行时间 ：3分5秒812毫秒
+====================运行时间 ：3分5秒813毫秒
+====================运行时间 ：3分56秒755毫秒
+====================运行时间 ：4分45秒953毫秒
+====================运行时间 ：5分35秒919毫秒
+====================运行时间 ：6分25秒370毫秒
+====================运行时间 ：8分6秒248毫秒
+====================运行时间 ：8分55秒339毫秒
+====================运行时间 ：9分45秒632毫秒
+====================运行时间 ：9分45秒632毫秒
+所有线程运行结束
+insert into CLD_TEMP_DATA_NEW select * from CLD_TEMP_DATA_OCS
+====================运行时间 ：2小时14分41秒273毫秒
+将ocs的数据插入cld_temp_data表完成
+跑十个线程，存数据进入cld_temp_data_ocs , 并且将数据存入存数据进入cld_temp_data_new
+insert into cld_temp_data_new select * from cld_temp_data_last
+====================运行时间 ：12毫秒
+立即出账数据插入cld_temp_data_new完成
+select count(*) coun from user_tables where table_name =upper('cld_serv_acc_new')
+drop table cld_serv_acc_new purge
+该语句成功删除条数 ====0
+====================运行时间 ：149毫秒
+create table  cld_serv_acc_new tablespace CUST_USER 
+ as
+ select 
+/*+ USE_HASH(m u) */ 
+msisdn,  serv_id , acct_id,sum(charge)charge 
+from cld_temp_data_new 
+group by msisdn,serv_id , acct_id
+====================运行时间 ：11分16秒662毫秒
+create index serv_acc_new_01 on cld_serv_acc_new(msisdn)
+====================运行时间 ：1分50秒364毫秒
+create index serv_acc_new_01 on cld_serv_acc_new(acct_id)
+java.sql.SQLException: ORA-00955: 名称已由现有对象使用
+ORA-06512: 在 "DBUSR07.SQL_PROCEDURE", line 5
+ORA-06512: 在 line 1
+
+	at oracle.jdbc.dbaccess.DBError.throwSqlException(DBError.java:134)
+	at oracle.jdbc.ttc7.TTIoer.processError(TTIoer.java:289)
+	at oracle.jdbc.ttc7.Oall7.receive(Oall7.java:573)
+	at oracle.jdbc.ttc7.TTC7Protocol.doOall7(TTC7Protocol.java:1891)
+	at oracle.jdbc.ttc7.TTC7Protocol.parseExecuteFetch(TTC7Protocol.java:1093)
+	at oracle.jdbc.driver.OracleStatement.executeNonQuery(OracleStatement.java:2047)
+	at oracle.jdbc.driver.OracleStatement.doExecuteOther(OracleStatement.java:1940)
+	at oracle.jdbc.driver.OracleStatement.doExecuteWithTimeout(OracleStatement.java:2709)
+	at oracle.jdbc.driver.OraclePreparedStatement.executeUpdate(OraclePreparedStatement.java:589)
+	at oracle.jdbc.driver.OraclePreparedStatement.execute(OraclePreparedStatement.java:656)
+	at Pro.ProcUtil.callProc(ProcUtil.java:57)
+	at Pro.ProcUtil.callProc(ProcUtil.java:160)
+	at vip.CreateDateStep2.main(CreateDateStep2.java:66)
+	at vip.AllEntrances.main(AllEntrances.java:31)
+Pro.CallProcedureException: 调用存储过程出错! PROC_NAME = { call sql_procedure(?) }
+	at Pro.ProcUtil.callProc(ProcUtil.java:99)
+	at Pro.ProcUtil.callProc(ProcUtil.java:160)
+	at vip.CreateDateStep2.main(CreateDateStep2.java:66)
+	at vip.AllEntrances.main(AllEntrances.java:31)
+select count(*) coun from user_tables where table_name =upper('cld_all_data_new')
+drop table cld_all_data_new purge
+该语句成功删除条数 ====0
+====================运行时间 ：74毫秒
+  create table cld_all_data_new as
+ select  /*+ USE_HASH(m u) */  
+   a.msisdn , a.serv_id, a.acct_id ,a.charge
+  ,b.prod_inst_id as msisdn_new
+  ,c.acct_id as acct_id_new
+  ,c.cust_id as cust_id_new
+   from cld_serv_acc_new a left join  cus.prod_inst@CRM_COPY b on b.status_cd<>'110000'  and b.prod_use_type='1000' 
+ and a.msisdn = b.acc_num
+ left join  account c  on c.acct_cd = to_char(a.acct_id)
+====================运行时间 ：1小时52分4秒25毫秒
+create index all_data_new_01 on cld_all_data_new(serv_id)
+====================运行时间 ：2分7秒571毫秒
+DELETE
+FROM
+  cld_all_data_new A
+WHERE
+  (A.msisdn, A.serv_id , A.acct_id) IN (
+    SELECT
+      msisdn,
+      serv_id,acct_id
+    FROM
+      cld_all_data_new
+    GROUP BY
+      msisdn,
+      serv_id,acct_id
+    HAVING
+      COUNT (*) > 1
+  )
+AND ROWID NOT IN (
+  SELECT
+    MIN (ROWID)
+  FROM
+      cld_all_data_new
+    GROUP BY
+      msisdn,
+      serv_id,acct_id
+    HAVING
+      COUNT (*) > 1
+)
+该语句成功删除条数 ====3415
+====================运行时间 ：6分39秒561毫秒
+select count(*) coun from user_tables where table_name =upper('cld_temp_meal')
+drop table cld_temp_meal purge
+该语句成功删除条数 ====0
+====================运行时间 ：222毫秒
+create table  cld_temp_meal tablespace CUST_USER as
+select 
+/*+ USE_HASH(m u) */  
+a.ACCT_ITEM_TYPE_ID ,
+a.msisdn,
+a.acct_id, 
+sum(charge) charge , 
+CASE 
+WHEN sum(charge) > 0 THEN  '02' --套外
+WHEN sum(charge) = 0 THEN  '01' --套内
+ELSE  '03'
+END MEAL_TYPE
+from cld_temp_data_new a 
+group by a.ACCT_ITEM_TYPE_ID ,
+a.msisdn,
+a.acct_id
+====================运行时间 ：17分39秒551毫秒
+select count(*) coun from user_tables where table_name =upper('cld_temp_data_meal')
+drop table cld_temp_data_meal purge
+该语句成功删除条数 ====0
+====================运行时间 ：139毫秒
+create table cld_temp_data_meal as
+select
+/*+ USE_HASH(m u) */
+ t.msisdn,
+ t.serv_id,
+ t.prd_inst_id        ,
+ t.product_offer_id,
+ t.product_offer_inst_id,
+ t.acct_id,
+ t.cust_id             ,
+ t.crm_acct_id,
+ t.billing_cycle_id,
+ t.billing_cycle_id_ori,
+ t.charge,
+ t.item_source,
+ t.biz_type,
+ t.acct_item_list,
+ t.acct_item_type_id,
+ t.acct_item_name,
+ t.billing_mode,
+ t.acc_nbr,
+ t.cdr_key,
+ t.rome_type,
+ m.meal_type,
+ t.busi_type,
+ t.reserver2,
+ t.reserver3,
+ t.reserver4,
+ t.reserver5
+  from cld_temp_data_new t ,
+   cld_temp_meal m
+where 
+    t.msisdn = m.msisdn
+and t.ACCT_ITEM_TYPE_ID= m.ACCT_ITEM_TYPE_ID
+and t.acct_id = m.acct_id
+====================运行时间 ：53分13秒127毫秒
+select count(*) coun from user_tables where table_name =upper('CLD_TEMP_DATA_ALL_new')
+drop table CLD_TEMP_DATA_ALL_new purge
+该语句成功删除条数 ====0
+====================运行时间 ：70毫秒
+ create table cld_temp_data_all_new as
+select
+/*+ USE_HASH(m u) */
+ t.msisdn,
+ c.msisdn_new,
+ t.serv_id,
+ c.msisdn_new serv_id_new,
+ --t.prod_inst_id        ,
+  c.msisdn_new prd_inst_id,
+ t.product_offer_id,
+ t.product_offer_inst_id,
+ t.acct_id,
+ c.acct_id_new,
+ --t.cust_id             ,
+ c.cust_id_new,
+ t.crm_acct_id,
+ t.billing_cycle_id,
+ t.billing_cycle_id_ori,
+ t.charge,
+ t.item_source,
+ t.biz_type,
+ t.acct_item_list,
+ t.acct_item_type_id,
+ t.acct_item_name,
+ t.billing_mode,
+ t.acc_nbr,
+ t.cdr_key,
+ t.rome_type,
+  t.meal_type           ,
+ --m.meal_type,
+ t.busi_type,
+ t.reserver2,
+ t.reserver3,
+ t.reserver4,
+ t.reserver5
+  from cld_temp_data_meal  t ,
+   cld_all_data_new c
+where 
+    c.serv_id = t.serv_id
+    and c.acct_id = t.acct_id
+====================运行时间 ：25分44秒969毫秒
+delete CLD_TEMP_DATA_ALL_new where billing_cycle_id ='202006' 
+该语句成功删除条数 ====0
+====================运行时间 ：6分41秒999毫秒
+在 CLD_TEMP_DATA_ALL_new 删除立即出账数据完成
+最终表生产完成===========
+数据准备，生成最终表cld_temp_data_all
