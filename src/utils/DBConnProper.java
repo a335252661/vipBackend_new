@@ -1,15 +1,81 @@
 package utils;
 
+import helps.Properties2Help;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * @author 程刘德
  * @version 1.0
  * @Description TODO
  * @date 2019/12/12
+ *
+ * 使用jdbctemplte  必须一下jar
+ * spring-beans-3.2.3.RELEASE.jar
+ * spring-core-3.2.3.RELEASE.jar
+ * spring-jdbc-3.2.3.RELEASE.jar
+ * spring-tx-3.2.3.RELEASE.jar
+ *
  */
-public class DBConn {
+public class DBConnProper {
+    private static String url = "";
+    private static String user ="";
+    private static String pwd = "";
+    private static String driver="";
+    public static void main(String[] args) {
+//        Connection oracle_local = DBConn.getConnection("oracle_local");
+        JdbcTemplate jdbcTemplate = DBConnProper.getJdbcTemplate("oracle_local");
+        String sql = " select cust from cld_err where rownum =1"   ;
+        String cust = jdbcTemplate.queryForObject(sql, String.class) ;
+        System.out.println(cust);
+    }
+    
+    public static void init(String name) {
+        Properties init = Properties2Help.init("jdbc.properties");
+         url = init.getProperty(name+".url");
+         user = init.getProperty(name+".user");
+         pwd = init.getProperty(name+".pwd");
+         driver = init.getProperty(name+".driver");
+        System.out.println("------------------------加载数据库连接----------------------------");
+        System.out.println("url="+url);
+        System.out.println("user="+user);
+        System.out.println("pwd="+pwd);
+        System.out.println("------------------------------------------------------------------");
+    }
+
+
+    public static Connection getConnection(String name) {
+        DriverManagerDataSource dataSource = DBConnProper.getDataSource(name);
+        Connection connection =null;
+        try {
+             connection = dataSource.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return connection;
+    }
+
+    public static JdbcTemplate getJdbcTemplate(String name) {
+        DriverManagerDataSource dataSource = DBConnProper.getDataSource(name);
+        JdbcTemplate jdbcTemplate= new JdbcTemplate(dataSource);
+        return jdbcTemplate;
+    }
+
+    public static DriverManagerDataSource getDataSource(String name) {
+        DBConnProper.init(name);
+        DriverManagerDataSource datasource = new DriverManagerDataSource();
+        datasource.setUrl(url);
+        datasource.setUsername(user);
+        datasource.setPassword(pwd);
+        datasource.setDriverClassName(driver);
+        return datasource;
+    }
+
 
     public static Connection getLocalConn() {
         String dbUrl = "jdbc:oracle:thin:@127.0.0.1:1521:orcl";

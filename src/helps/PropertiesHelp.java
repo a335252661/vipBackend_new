@@ -2,6 +2,7 @@ package helps;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -13,15 +14,15 @@ import java.util.Properties;
  * @description:
  */
 public class PropertiesHelp {
-    public static Properties init(String fullLocation){
-        Properties proper =  new Properties();
+    public static Properties init(String fullLocation) {
+        Properties proper = new Properties();
         try {
             proper.load(new FileReader(fullLocation));  //配置文件读取uri
-            Map<String,String> map=new HashMap<String,String>();
+            Map<String, String> map = new HashMap<String, String>();
             Iterator<Object> keys = proper.keySet().iterator();
-            while(keys.hasNext()) {
-                String key= (String)keys.next();
-                if(proper.getProperty(key)!=null){
+            while (keys.hasNext()) {
+                String key = (String) keys.next();
+                if (proper.getProperty(key) != null) {
                     map.put(key, proper.getProperty(key).toString());
                 }
             }
@@ -32,9 +33,14 @@ public class PropertiesHelp {
         }
         return proper;
     }
-    
+
+
+
     public static void main(String[] args) {
-        Properties init = PropertiesHelp.init("D:\\project\\vipBackend\\out\\artifacts\\vipBackend_jar\\test.properties");
-        System.out.println(init.getProperty("name"));
+//        Properties init = PropertiesHelp.init("D:\\project\\vipBackend\\out\\artifacts\\vipBackend_jar\\test.properties");
+//        System.out.println(init.getProperty("name"));
+
+
+
     }
 }
