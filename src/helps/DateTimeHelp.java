@@ -29,6 +29,16 @@ public class DateTimeHelp {
 //        System.out.println(DateTimeHelp.strToStr("2018-05-01 00:00:00" , dateTimeString,"yyyyMMdd"));
 
         System.out.println("你好");
+
+        String mm = "2020-09-1908:28:16";
+
+        Date date = DateTimeHelp.strToDate(mm, dateTimeString);
+
+
+
+        System.out.println(date);
+
+
     }
 
 
