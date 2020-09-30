@@ -13,7 +13,7 @@ import java.io.InputStreamReader;
 import java.util.Date;
 
 /**
- * @author ³ÌÁõµÂ
+ * @author ç¨‹åˆ˜å¾·
  * @version 1.0
  * @Description TODO
  * @date 2020/4/16
@@ -30,10 +30,10 @@ public class cld {
 
 
     /**
-     * Ö´ĞĞÏµÍ³ÃüÁî, ·µ»ØÖ´ĞĞ½á¹û
+     * æ‰§è¡Œç³»ç»Ÿå‘½ä»¤, è¿”å›æ‰§è¡Œç»“æœ
      *
-     * @param cmd ĞèÒªÖ´ĞĞµÄÃüÁî
-     * @param dir Ö´ĞĞÃüÁîµÄ×Ó½ø³ÌµÄ¹¤×÷Ä¿Â¼, null ±íÊ¾ºÍµ±Ç°Ö÷½ø³Ì¹¤×÷Ä¿Â¼ÏàÍ¬
+     * @param cmd éœ€è¦æ‰§è¡Œçš„å‘½ä»¤
+     * @param dir æ‰§è¡Œå‘½ä»¤çš„å­è¿›ç¨‹çš„å·¥ä½œç›®å½•, null è¡¨ç¤ºå’Œå½“å‰ä¸»è¿›ç¨‹å·¥ä½œç›®å½•ç›¸åŒ
      */
     public static String execCmd(String cmd, File dir) throws Exception {
         StringBuilder result = new StringBuilder();
@@ -43,17 +43,17 @@ public class cld {
         BufferedReader bufrError = null;
 
         try {
-            // Ö´ĞĞÃüÁî, ·µ»ØÒ»¸ö×Ó½ø³Ì¶ÔÏó£¨ÃüÁîÔÚ×Ó½ø³ÌÖĞÖ´ĞĞ£©
+            // æ‰§è¡Œå‘½ä»¤, è¿”å›ä¸€ä¸ªå­è¿›ç¨‹å¯¹è±¡ï¼ˆå‘½ä»¤åœ¨å­è¿›ç¨‹ä¸­æ‰§è¡Œï¼‰
             process = Runtime.getRuntime().exec(cmd, null, dir);
 
-            // ·½·¨×èÈû, µÈ´ıÃüÁîÖ´ĞĞÍê³É£¨³É¹¦»á·µ»Ø0£©
+            // æ–¹æ³•é˜»å¡, ç­‰å¾…å‘½ä»¤æ‰§è¡Œå®Œæˆï¼ˆæˆåŠŸä¼šè¿”å›0ï¼‰
             process.waitFor();
 
-            // »ñÈ¡ÃüÁîÖ´ĞĞ½á¹û, ÓĞÁ½¸ö½á¹û: Õı³£µÄÊä³ö ºÍ ´íÎóµÄÊä³ö£¨PS: ×Ó½ø³ÌµÄÊä³ö¾ÍÊÇÖ÷½ø³ÌµÄÊäÈë£©
+            // è·å–å‘½ä»¤æ‰§è¡Œç»“æœ, æœ‰ä¸¤ä¸ªç»“æœ: æ­£å¸¸çš„è¾“å‡º å’Œ é”™è¯¯çš„è¾“å‡ºï¼ˆPS: å­è¿›ç¨‹çš„è¾“å‡ºå°±æ˜¯ä¸»è¿›ç¨‹çš„è¾“å…¥ï¼‰
             bufrIn = new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"));
             bufrError = new BufferedReader(new InputStreamReader(process.getErrorStream(), "UTF-8"));
 
-            // ¶ÁÈ¡Êä³ö
+            // è¯»å–è¾“å‡º
             String line = null;
             while ((line = bufrIn.readLine()) != null) {
                 result.append(line).append('\n');
@@ -66,13 +66,13 @@ public class cld {
             closeStream(bufrIn);
             closeStream(bufrError);
 
-            // Ïú»Ù×Ó½ø³Ì
+            // é”€æ¯å­è¿›ç¨‹
             if (process != null) {
                 process.destroy();
             }
         }
 
-        // ·µ»ØÖ´ĞĞ½á¹û
+        // è¿”å›æ‰§è¡Œç»“æœ
         return result.toString();
     }
 

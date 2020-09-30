@@ -2,6 +2,7 @@ package vip;
 
 import Pro.ProcUtil;
 import helps.DateTimeHelp;
+import helps.LogHelp;
 import helps.SQLHelp;
 import utils.*;
 
@@ -54,11 +55,12 @@ public class CreateDateStep3_ALL {
 
         try{
             ProcUtil.callProc(conn,"sql_procedure",  new Object[]{create_cld_serv_acc});
-
             ProcUtil.callProc(conn,"sql_procedure",  new Object[]{"create index serv_acc_new_01 on cld_serv_acc_new(msisdn)"});
             ProcUtil.callProc(conn,"sql_procedure",  new Object[]{"create index serv_acc_new_02 on cld_serv_acc_new(acct_id)"});
 
-
+            LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
+                    "cld_serv_acc_new 创建成功"
+                    ,true);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -83,11 +85,20 @@ public class CreateDateStep3_ALL {
                 "   from cld_serv_acc_new a left join  cus.prod_inst@CRM_COPY b  \n" +
                 " on a.msisdn = b.acc_num\n" +
                 " left join  account c  on c.acct_cd = to_char(a.acct_id)";
+        if(sign.equals("pro")){
+        }else {
+            //用于测试
+            create_cld_all_data = create_cld_all_data.replaceAll("cus.prod_inst@CRM_COPY" ,"prod_inst" );
+            create_cld_all_data = create_cld_all_data.replaceAll("account" ,"dbusr07.account@zwdb_prod" );
+        }
         try{
             ProcUtil.callProc(conn,"sql_procedure",  new Object[]{create_cld_all_data});
             ProcUtil.callProc(conn,"sql_procedure",  new Object[]{"create index new_msis_01 on cld_all_data_new(msisdn)"});
             ProcUtil.callProc(conn,"sql_procedure",  new Object[]{"create index new_serv_id_01 on cld_all_data_new(serv_id)"});
             ProcUtil.callProc(conn,"sql_procedure",  new Object[]{"create index new_acct_01 on cld_all_data_new(acct_id)"});
+            LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
+                    "cld_all_data_new 创建成功"
+                    ,true);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -124,8 +135,10 @@ public class CreateDateStep3_ALL {
                 "      COUNT (*) > 1\n" +
                 ")";
         SQLHelp.deleteSQL(conn,delete);
-        System.out.println("cld_all_data_new=="+SQLHelp.querySQLReturnList2(conn,"select count(1),sum(charge) from cld_all_data_new"));
-
+        String mm = "cld_all_data_new=="+SQLHelp.querySQLReturnList2(conn,"select count(1),sum(charge) from cld_all_data_new");
+        LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
+                mm
+                ,true);
 
 
 
@@ -212,10 +225,7 @@ public class CreateDateStep3_ALL {
                 "                select\n" +
                 "                /*+ USE_HASH(m u) */\n" +
                 "                 t.msisdn,\n" +
-//                "                 c.msisdn_new,\n" +
                 "                 t.serv_id,\n" +
-//                "                 c.msisdn_new serv_id_new,\n" +
-//                "                 --t.prod_inst_id        ,\n" +
                 "                  c.msisdn_new prd_inst_id,\n" +
                 "                 t.product_offer_id,\n" +
                 "                 t.product_offer_id_new,\n" +
@@ -252,6 +262,13 @@ public class CreateDateStep3_ALL {
                 "and   t.msisdn = c.msisdn";
         SQLHelp.insertSQL(conn,sql);
 
+        ArrayList<String> quer = SQLHelp.querySQLReturnList2(conn,"select count(1),sum(charge) from cld_temp_data_all_new");
+        String count =  quer.get(0);
+        String sum =  quer.get(1);
+        LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
+                "cld_temp_data_all_new=="+quer
+                ,true);
+
         //
         try{
             ProcUtil.callProc(conn,"sql_procedure",  new Object[]{"grant all on CLD_TEMP_DATA_ALL_new to public"});
@@ -261,15 +278,47 @@ public class CreateDateStep3_ALL {
 
         System.out.println("===================数据统计======================");
 
-//        CreateDateStep3_ALL step2 = new CreateDateStep3_ALL();
-//        step2.queryZQ();
+        CreateDateStep3_ALL step2 = new CreateDateStep3_ALL();
+        step2.queryZQ();
 //
-//        ArrayList<String> cld_temp_data_new_list2 = SQLHelp.querySQLReturnList2(conn, "select count(1) coun , sum(charge) charge from cld_temp_data_new");
-//        System.out.println("所有数据汇入完成");
-//        System.out.println("最终cld_temp_data_new ： "+cld_temp_data_new_list2);
-//
-//        ArrayList<String> CLD_TEMP_DATA_ALL_new = SQLHelp.querySQLReturnList2(conn, "select count(1) coun , sum(charge) charge from CLD_TEMP_DATA_ALL_new");
-//        System.out.println("最终CCLD_TEMP_DATA_ALL_NEW ： "+CLD_TEMP_DATA_ALL_new);
+
+        ArrayList<String> querall = SQLHelp.querySQLReturnList2(conn,"select count(1),sum(charge) from cld_temp_data_all_new");
+        String countall =  querall.get(0);
+        String sumall =  querall.get(1);
+
+        LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
+                "政企数据汇入完成 ： cld_temp_data_all_new=="+querall
+                ,true);
+
+
+
+        String zqcount = zq_list.get(0);
+        String zqsum = zq_list.get(1);
+
+        // String count =  quer.get(0);
+        //        String sum =  quer.get(1);
+
+        //原数据统计
+        Long allcount = Long.parseLong(count)+Long.parseLong(zqcount);
+        Long allcharge = Long.parseLong(sum)+Long.parseLong(zqsum);
+        LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
+                "数据统计条数（原条数+政企条数） ： "+count + "+" +zqcount +"="+allcount
+                ,true);
+        LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
+                "数据统计金额（原金额+政企金额） ： "+sum + "+" +zqsum +"="+allcharge
+                ,true);
+
+
+
+        if((allcount+"").equals(countall)  &&  (allcharge+"").equals(sumall)){
+            LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
+                    "******数据最终校验一致*****"
+                    ,true);
+        }else {
+            LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
+                    "******数据最终校验不一致*****"
+                    ,true);
+        }
 
 
         System.out.println("=================================================");
@@ -279,10 +328,20 @@ public class CreateDateStep3_ALL {
 
     public void queryZQ() {
 
-        zq_list = SQLHelp.querySQLReturnList2(conn,
-                "select count(1) coun , sum(charge) charge from ASSE_HTSR.ASSE_HTSR_COLLECT_2@icstax where billing_cycle_id='"+lastMon+"'");
+
+        String cyc = "select count(1) coun , sum(charge) charge from ASSE_HTSR.ASSE_HTSR_COLLECT_2@icstax where billing_cycle_id='"+lastMon+"'";
+
+        if(sign.equals("test")){
+            cyc = "select count(1) coun , sum(charge) charge from dbusr07.ASSE_HTSR_COLLECT_2@zwdb_prod";
+        }
+        zq_list = SQLHelp.querySQLReturnList2(conn, cyc);
         if(zq_list.get(0).equals("0")){
             //政企数据未查询到，等待一小时后再运行
+
+            LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
+                    "政企数据未查询到，等待一小时后再运行"
+                    ,true);
+
             try {
                 Thread.sleep(3600000);
                 this.queryZQ();
@@ -290,9 +349,9 @@ public class CreateDateStep3_ALL {
                 e.printStackTrace();
             }
         }else {
-
-            System.out.println("基础政企ASSE_HTSR_COLLECT_2 ： "+zq_list);
-
+            LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
+                    "基础政企ASSE_HTSR_COLLECT_2 ： "+zq_list
+                    ,true);
 
             //将立即出账数据存入CLD_TEMP_DATA_ALL_new 数据
             String insert = "insert into CLD_TEMP_DATA_ALL_new select a.MSISDN\n" +
@@ -324,8 +383,15 @@ public class CreateDateStep3_ALL {
                     ",a.RESERVER4\n" +
                     ",a.RESERVER5\n" +
                     " from ASSE_HTSR.ASSE_HTSR_COLLECT_2@icstax a where billing_cycle_id='"+lastMon+"'";
+            if(sign.equals("test")){
+                insert = insert.replaceAll("ASSE_HTSR.ASSE_HTSR_COLLECT_2@icstax" , "dbusr07.ASSE_HTSR_COLLECT_2@zwdb_prod");
+            }
             SQLHelp.insertSQL(conn,insert);
-            System.out.println("政企数据插入CLD_TEMP_DATA_ALL_new完成");
+
+            LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
+                    "政企数据插入CLD_TEMP_DATA_ALL_new完成"
+                    ,true);
+
         }
 
     }

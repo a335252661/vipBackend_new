@@ -43,7 +43,7 @@ public  class WeChatHelp {
         js.put("text",jsText);
         return js;
     }
-    public static void sendCompanyWeChatMsg(String secret , String msg){
+    synchronized  public static void sendCompanyWeChatMsg(String secret , String msg){
         try{
 
 //            String str = new String(msg.getBytes("GBK"));
