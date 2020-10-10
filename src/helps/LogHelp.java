@@ -72,6 +72,7 @@ public class LogHelp {
             String NAME = map.get("NAME").toString();
             String MSG_ID = map.get("MSG_ID").toString();
             String MSG = map.get("MSG").toString();
+            System.out.println("faosng");
             WeChatHelp.sendCompanyWeChatMsg(WeChatHelp.log_secret,"==========="+NAME + "=========="+MSG);
             String up = "update dbusr07.CLD_LOGS@zwdb_prod set send  =1 ,send_time =sysdate where MSG_ID='"+MSG_ID+"'";
             SQLHelp.updateSQL(conn,up);
@@ -83,13 +84,13 @@ public class LogHelp {
 
     public static void main(String[] args) {
         Connection conn = DBConn.getDbusr07TestConn();
-//        LogHelp.insertCldLogs(conn,"月账test","测试1",true);
+        LogHelp.insertCldLogsTest(conn,"月账test","测试shengc",true);
 //        LogHelp.insertCldLogs(conn,"月账test","测试2",true);
 //        LogHelp.insertCldLogs(conn,"月账test","测试3",true);
 //        LogHelp.insertCldLogs(conn,"月账test","测试4",true);
 //        LogHelp.insertCldLogs(conn,"月账test","测试dsadsa223333",true);
 
-        LogHelp.sendMsg(conn);
+//        LogHelp.sendMsg(conn);
 
     }
 }

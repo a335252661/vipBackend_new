@@ -1,6 +1,7 @@
 package vip.shishou;
 
 import helps.DateTimeHelp;
+import helps.FileHelp;
 import helps.ListHelp;
 import helps.SQLHelp;
 import utils.DBConn;
@@ -24,8 +25,8 @@ import java.util.List;
  * @date 2020/9/10
  */
 public class ShishouCreateFile {
-    private static String sign = "test";
-    //    private static String sign = "pro";
+//    private static String sign = "test";
+        private static String sign = "pro";
     private static String dirLocation = "";
     private static String finaDir = "";
     //每个文件存放数据条数
@@ -45,9 +46,9 @@ public class ShishouCreateFile {
 
     static {
         if (sign.equals("pro")) {
-            iamConn = DBConn.getDbusr07ProConn();
-            dirLocation = "/home/bgusr01/vip_backend/2.1new/";
-            finaDir = "/home/bgusr01/vip_backend/files/";
+            iamConn = DBConn.getBssConn();
+            dirLocation = "/home/bgusr01/vip_backend/shishou/ok/";
+            finaDir = "/home/bgusr01/vip_backend/shishou/files/";
 
             limitTol = 100000L;
         } else {
@@ -62,7 +63,8 @@ public class ShishouCreateFile {
         DateTimeHelp.start();
         try {
            final ShishouCreateFile shishouCreateFile = new ShishouCreateFile();
-            ResultSet resultSet = SQLHelp.querySQLReturnResultSet(iamConn, "select * from dbusr01.jt_shishou_result@zwdb_prod");
+//            ResultSet resultSet = SQLHelp.querySQLReturnResultSet(iamConn, "select * from dbusr01.jt_shishou_result@zwdb_prod where rownum <130000");
+            ResultSet resultSet = SQLHelp.querySQLReturnResultSet(iamConn, "select * from jt_shishou_result");
             List<String> columnNameList = shishouCreateFile.getColumnName(resultSet);
 
             int i = 0;
@@ -137,7 +139,7 @@ public class ShishouCreateFile {
             } catch (Exception e) {
 
             }
-
+            FileHelp.dirToDir(dirLocation , finaDir);
             DateTimeHelp.end();
 
         }

@@ -15,14 +15,14 @@ import java.util.List;
 /**
  * @author zhangye
  *
- * ´æ´¢¹ı³Ìµ÷ÓÃÀà
+ * å­˜å‚¨è¿‡ç¨‹è°ƒç”¨ç±»
  */
 public class ProcUtil {
 	
 	/**
-	 * µ÷ÓÃ´æ´¢¹ı³Ì·½·¨
-	 * @param dbConn	 Êı¾İ¿âÁ´½Ó
-	 * @param paramList  ÊäÈëÊä³ö²ÎÊı¼¯ºÏ
+	 * è°ƒç”¨å­˜å‚¨è¿‡ç¨‹æ–¹æ³•
+	 * @param dbConn	 æ•°æ®åº“é“¾æ¥
+	 * @param paramList  è¾“å…¥è¾“å‡ºå‚æ•°é›†åˆ
 	 * @return
 	 * @throws Exception
 	 */
@@ -39,10 +39,10 @@ public class ProcUtil {
 			for(int i = 0;i < paramList.size();i++){
 				procParam = (ProcParam)paramList.get(i);
 				if(procParam instanceof ProcInputParam){
-					//ÉèÖÃÊäÈë²ÎÊı
+					//è®¾ç½®è¾“å…¥å‚æ•°
 					setIntputParam(callStmt,procParam);
 				} else if(procParam instanceof ProcOutputParam){
-					//ÉèÖÃÊä³ö²ÎÊı
+					//è®¾ç½®è¾“å‡ºå‚æ•°
 					if(PROC_PARAM_TYPE.ARRAY == procParam.getParamType()){
 						ProcOutputParam tmp = (ProcOutputParam)procParam;
 						callStmt.registerOutParameter(procParam.getIndex(), procParam.getParamType(),tmp.getObjectName());
@@ -53,10 +53,10 @@ public class ProcUtil {
 					outParamList.add(procParam);
 				}
 			}
-			//Ö´ĞĞ´æ´¢¹ı³Ì
+			//æ‰§è¡Œå­˜å‚¨è¿‡ç¨‹
 			callStmt.execute();
 			
-			//½ÓÊÕÊä³ö²ÎÊı
+			//æ¥æ”¶è¾“å‡ºå‚æ•°
 			for(int i = 0;i < outParamList.size();i++){
 				procOutputParam = (ProcOutputParam)outParamList.get(i);
 				switch (procOutputParam.getParamType()) {
@@ -96,7 +96,7 @@ public class ProcUtil {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new CallProcedureException("µ÷ÓÃ´æ´¢¹ı³Ì³ö´í! PROC_NAME = "+callProcStr);
+			throw new CallProcedureException("è°ƒç”¨å­˜å‚¨è¿‡ç¨‹å‡ºé”™! PROC_NAME = "+callProcStr);
 		} finally {
 			JdbcUtil.close(rs);
 			JdbcUtil.close(callStmt);
@@ -104,14 +104,14 @@ public class ProcUtil {
 	}
 	
 	/**
-	 * µ÷ÓÃ´æ´¢¹ı³Ì·½·¨²éÑ¯
-	 * µ÷ÓÃ¸Ã·½·¨Ê±£¬Çë×ñÊØÏÂÁĞ¹æÔò
-	 * 1)Êı×éË³Ğò±ØĞë°´Èë²ÎË³Ğò·ÅÖÃ,¸Ã·½·¨»á½«²ÎÊıÄ¬ÈÏÒÔVARCHARÀàĞÍ´«Èë
-	 * 2)´æ´¢¹ı³Ì×îºóÒ»¸ö²ÎÊı±ØĞëÊÇÊä³öÓÎ±ê²ÎÊı
-	 * @param dbConn	 Êı¾İ¿âÁ´½Ó
-	 * @param procName   ´æ´¢¹ı³ÌÃû
-	 * @param paramArr   ÊäÈë²ÎÊıÊı×é Êı×éË³ĞòÓ¦°´Èë²ÎË³Ğò·ÅÖÃ
-	 * @return ²éÑ¯½á¹û
+	 * è°ƒç”¨å­˜å‚¨è¿‡ç¨‹æ–¹æ³•æŸ¥è¯¢
+	 * è°ƒç”¨è¯¥æ–¹æ³•æ—¶ï¼Œè¯·éµå®ˆä¸‹åˆ—è§„åˆ™
+	 * 1)æ•°ç»„é¡ºåºå¿…é¡»æŒ‰å…¥å‚é¡ºåºæ”¾ç½®,è¯¥æ–¹æ³•ä¼šå°†å‚æ•°é»˜è®¤ä»¥VARCHARç±»å‹ä¼ å…¥
+	 * 2)å­˜å‚¨è¿‡ç¨‹æœ€åä¸€ä¸ªå‚æ•°å¿…é¡»æ˜¯è¾“å‡ºæ¸¸æ ‡å‚æ•°
+	 * @param dbConn	 æ•°æ®åº“é“¾æ¥
+	 * @param procName   å­˜å‚¨è¿‡ç¨‹å
+	 * @param paramArr   è¾“å…¥å‚æ•°æ•°ç»„ æ•°ç»„é¡ºåºåº”æŒ‰å…¥å‚é¡ºåºæ”¾ç½®
+	 * @return æŸ¥è¯¢ç»“æœ
 	 * @throws CallProcedureException 
 	 */
 	
@@ -124,14 +124,14 @@ public class ProcUtil {
 	}
 	
 	/**
-	 * µ÷ÓÃ´æ´¢¹ı³Ì·½·¨²éÑ¯
-	 * µ÷ÓÃ¸Ã·½·¨Ê±£¬Çë×ñÊØÏÂÁĞ¹æÔò
-	 * 1)Êı×éË³Ğò±ØĞë°´Èë²ÎË³Ğò·ÅÖÃ,¸Ã·½·¨»á½«²ÎÊıÄ¬ÈÏÒÔVARCHARÀàĞÍ´«Èë
-	 * 2)´æ´¢¹ı³Ì×îºóÒ»¸ö²ÎÊı±ØĞëÊÇÊä³öÓÎ±ê²ÎÊı
-	 * @param dbConn	 Êı¾İ¿âÁ´½Ó
-	 * @param procName   ´æ´¢¹ı³ÌÃû
-	 * @param paramArr   ÊäÈë²ÎÊıÊı×é Êı×éË³ĞòÓ¦°´Èë²ÎË³Ğò·ÅÖÃ
-	 * @return ²éÑ¯½á¹û
+	 * è°ƒç”¨å­˜å‚¨è¿‡ç¨‹æ–¹æ³•æŸ¥è¯¢
+	 * è°ƒç”¨è¯¥æ–¹æ³•æ—¶ï¼Œè¯·éµå®ˆä¸‹åˆ—è§„åˆ™
+	 * 1)æ•°ç»„é¡ºåºå¿…é¡»æŒ‰å…¥å‚é¡ºåºæ”¾ç½®,è¯¥æ–¹æ³•ä¼šå°†å‚æ•°é»˜è®¤ä»¥VARCHARç±»å‹ä¼ å…¥
+	 * 2)å­˜å‚¨è¿‡ç¨‹æœ€åä¸€ä¸ªå‚æ•°å¿…é¡»æ˜¯è¾“å‡ºæ¸¸æ ‡å‚æ•°
+	 * @param dbConn	 æ•°æ®åº“é“¾æ¥
+	 * @param procName   å­˜å‚¨è¿‡ç¨‹å
+	 * @param paramArr   è¾“å…¥å‚æ•°æ•°ç»„ æ•°ç»„é¡ºåºåº”æŒ‰å…¥å‚é¡ºåºæ”¾ç½®
+	 * @return æŸ¥è¯¢ç»“æœ
 	 * @throws CallProcedureException 
 	 */
 	
@@ -143,13 +143,13 @@ public class ProcUtil {
 	}
 	
 	/**
-	 * ÓÃÓÚ¸üĞÂÊı¾İ¿â
-	 * µ÷ÓÃ¸Ã·½·¨Ê±£¬Çë×ñÊØÏÂÁĞ¹æÔò
-	 * 1)Êı×éË³Ğò±ØĞë°´Èë²ÎË³Ğò·ÅÖÃ,¸Ã·½·¨»á½«²ÎÊıÄ¬ÈÏÒÔVARCHARÀàĞÍ´«Èë
-	 * 2)´æ´¢¹ı³Ì²»ÄÜÓĞÊä³ö²ÎÊı
-	 * @param dbConn	 Êı¾İ¿âÁ´½Ó
-	 * @param procName   ´æ´¢¹ı³ÌÃû
-	 * @param paramArr   ÊäÈë²ÎÊıÊı×é Êı×éË³ĞòÓ¦°´Èë²ÎË³Ğò·ÅÖÃ
+	 * ç”¨äºæ›´æ–°æ•°æ®åº“
+	 * è°ƒç”¨è¯¥æ–¹æ³•æ—¶ï¼Œè¯·éµå®ˆä¸‹åˆ—è§„åˆ™
+	 * 1)æ•°ç»„é¡ºåºå¿…é¡»æŒ‰å…¥å‚é¡ºåºæ”¾ç½®,è¯¥æ–¹æ³•ä¼šå°†å‚æ•°é»˜è®¤ä»¥VARCHARç±»å‹ä¼ å…¥
+	 * 2)å­˜å‚¨è¿‡ç¨‹ä¸èƒ½æœ‰è¾“å‡ºå‚æ•°
+	 * @param dbConn	 æ•°æ®åº“é“¾æ¥
+	 * @param procName   å­˜å‚¨è¿‡ç¨‹å
+	 * @param paramArr   è¾“å…¥å‚æ•°æ•°ç»„ æ•°ç»„é¡ºåºåº”æŒ‰å…¥å‚é¡ºåºæ”¾ç½®
 	 * @throws CallProcedureException 
 	 */
 	

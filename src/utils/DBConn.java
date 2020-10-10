@@ -40,7 +40,19 @@ public class DBConn {
         return conn;
     }
 
-
+    public static Connection getBssConn() {
+        String dbUrl = "jdbc:oracle:thin:@10.145.240.154:1521:jtbssdb";
+        String dbUser = "bss";
+        String dbPwd = "jt#b2SS81";
+        Connection conn = null;
+        try {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            conn =  DriverManager.getConnection(dbUrl, dbUser, dbPwd);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return conn;
+    }
     public static Connection getDbusr07ProConn() {
         String dbUrl = "jdbc:oracle:thin:@10.7.95.67:1521:iamzwdb";
         String dbUser = "dbusr07";

@@ -10,13 +10,13 @@ import java.util.ArrayList;
  * @date 2020/2/28
  */
 public class CldChangeFile {
-    private static String dirLocation = "C:\\Users\\Admin\\Desktop\\常用\\IDC-云提-物联网\\2020-08-1开账2\\服务器原始文件\\";
+    private static String dirLocation = "D:\\坚果云同步位置\\开账\\2020-10-1开账\\服务器原始文件\\";
 
-    private static String ChangedirLocation = "C:\\Users\\Admin\\Desktop\\常用\\IDC-云提-物联网\\2020-08-1开账2\\调整之后文件\\";
+    private static String ChangedirLocation = "D:\\坚果云同步位置\\开账\\2020-10-1开账\\调整之后文件\\";
     //idc
-    private static String IDCFileName = "CRM2BILL.ZD.202007.012.021";
+    private static String IDCFileName = "CRM2BILL.ZD.202009.007.021";
     //云提
-    private static String YUNFileName = "CRM2BILL.ZD.202007.010.021";
+    private static String YUNFileName = "CRM2BILL.ZD.202009.006.021";
 
 
     private static int idcSize = 0;
