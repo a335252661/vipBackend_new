@@ -25,9 +25,9 @@ public class CreateDateStep2_ADD {
     private static Connection conn = null;
     static{
         if(sign.equals("pro")){
-            conn = DBConn.getDbusr07ProConn();
+            conn = DBConn.getCopyProConn();
         }else {
-            conn = DBConn.getDbusr07TestConn();
+            conn = DBConn.getCopyTestConn();
         }
     }
 
@@ -44,23 +44,23 @@ public class CreateDateStep2_ADD {
 
 
         ArrayList<String> cld_temp_data_new_list = SQLHelp.querySQLReturnList2(conn, "select count(1) coun , sum(charge) charge from cld_temp_data_new");
-        String count1 = cld_temp_data_new_list.get(0);
-        String sum1 = cld_temp_data_new_list.get(1);
+        String count1 = cld_temp_data_new_list.get(0)==null?"0":cld_temp_data_new_list.get(0);
+        String sum1 = cld_temp_data_new_list.get(1)==null?"0":cld_temp_data_new_list.get(1);
         LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
                 "基础cld_temp_data_new ： "+cld_temp_data_new_list
                 ,true);
 
 
         ArrayList<String> cld_temp_data_last_list = SQLHelp.querySQLReturnList2(conn, "select count(1) coun , sum(charge) charge from cld_temp_data_last");
-        String count2 = cld_temp_data_last_list.get(0);
-        String sum2 = cld_temp_data_last_list.get(1);
+        String count2 = cld_temp_data_last_list.get(0)==null?"0":cld_temp_data_last_list.get(0);
+        String sum2 = cld_temp_data_last_list.get(1)==null?"0":cld_temp_data_last_list.get(1);
         LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
                 "基础cld_temp_data_last ： "+cld_temp_data_last_list
                 ,true);
 
         ArrayList<String> CLD_TEMP_DATA_OCS_list = SQLHelp.querySQLReturnList2(conn, "select count(1) coun , sum(charge) charge from CLD_TEMP_DATA_OCS");
-        String count3 = CLD_TEMP_DATA_OCS_list.get(0);
-        String sum3 = CLD_TEMP_DATA_OCS_list.get(1);
+        String count3 = CLD_TEMP_DATA_OCS_list.get(0)==null?"0":CLD_TEMP_DATA_OCS_list.get(0);
+        String sum3 = CLD_TEMP_DATA_OCS_list.get(1)==null?"0":CLD_TEMP_DATA_OCS_list.get(1);;
         LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
                 "基础CLD_TEMP_DATA_OCS ： "+CLD_TEMP_DATA_OCS_list
                 ,true);

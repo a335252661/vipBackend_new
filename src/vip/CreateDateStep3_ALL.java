@@ -24,6 +24,7 @@ public class CreateDateStep3_ALL {
     private static int mm=0;
 
     private static Connection conn = null;
+    private static Connection conn07 = null;
 
     private static  String currMon = DateTimeHelp.dateToStr(new Date() , "yyyymm");
     private static  String lastMon = DateTimeHelp.dateToStr(DateTimeHelp.adjMonReDate(new Date(), -1), "yyyyMM");
@@ -35,16 +36,17 @@ public class CreateDateStep3_ALL {
 
     static{
         if(sign.equals("pro")){
-            conn = DBConn.getDbusr07ProConn();
+            conn = DBConn.getCopyProConn();
+            conn07 = DBConn.getDbusr07ProConn();
         }else {
-            conn = DBConn.getDbusr07TestConn();
+            conn = DBConn.getCopyTestConn();
         }
     }
 
     public static void main(String[] args) {
         //表存在则删除    cld_serv_acc
         SQLHelp.dropTable(conn,"cld_serv_acc_new");
-        String create_cld_serv_acc = "create table  cld_serv_acc_new tablespace CUST_USER \n" +
+        String create_cld_serv_acc = "create table  cld_serv_acc_new tablespace CUST_ACCT_ITEM \n" +
                 " as\n" +
                 " select \n" +
                 "/*+ USE_HASH(m u) */ \n" +
@@ -65,14 +67,16 @@ public class CreateDateStep3_ALL {
             e.printStackTrace();
         }
 
-//        SQLHelp.dropTable(conn,"account");
-//        String cc="create table account as select * from cus.account@CRM_COPY";
-//        try{
-//            ProcUtil.callProc(conn,"sql_procedure",  new Object[]{cc});
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
-//        System.out.println("备份结束");
+        SQLHelp.dropTable(conn,"account");
+        String cc="create table account as\n" +
+                "select  distinct acct_cd,acct_id,cust_id from cus.account@CRM_COPY";
+        try{
+            ProcUtil.callProc(conn,"sql_procedure",  new Object[]{cc});
+            ProcUtil.callProc(conn,"sql_procedure",  new Object[]{"create index acc_acccd on account(acct_cd)"});
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        System.out.println("备份结束");
 
 
         SQLHelp.dropTable(conn,"cld_all_data_new");
@@ -143,7 +147,7 @@ public class CreateDateStep3_ALL {
 
 
         SQLHelp.dropTable(conn,"cld_temp_meal");
-        String create_cld_temp_meal = "create table  cld_temp_meal tablespace CUST_USER as\n" +
+        String create_cld_temp_meal = "create table  cld_temp_meal tablespace CUST_ACCT_ITEM as\n" +
                 "select \n" +
                 "/*+ USE_HASH(m u) */  \n" +
                 "a.ACCT_ITEM_TYPE_ID ,\n" +
@@ -327,14 +331,12 @@ public class CreateDateStep3_ALL {
 
 
     public void queryZQ() {
-
-
         String cyc = "select count(1) coun , sum(charge) charge from ASSE_HTSR.ASSE_HTSR_COLLECT_2@icstax where billing_cycle_id='"+lastMon+"'";
 
         if(sign.equals("test")){
             cyc = "select count(1) coun , sum(charge) charge from dbusr07.ASSE_HTSR_COLLECT_2@zwdb_prod";
         }
-        zq_list = SQLHelp.querySQLReturnList2(conn, cyc);
+        zq_list = SQLHelp.querySQLReturnList2(conn07, cyc);
         if(zq_list.get(0).equals("0")){
             //政企数据未查询到，等待一小时后再运行
 
@@ -349,6 +351,22 @@ public class CreateDateStep3_ALL {
                 e.printStackTrace();
             }
         }else {
+            //@iamzwdb
+            //表存在则删除    cld_serv_acc
+            SQLHelp.dropTable(conn07,"ASSE_HTSR_COLLECT_2");
+            String create_ASSE_HTSR_COLLECT_2 = "create table ASSE_HTSR_COLLECT_2 as\n" +
+                    "select * from ASSE_HTSR.ASSE_HTSR_COLLECT_2@icstax";
+            try{
+                ProcUtil.callProc(conn07,"sql_procedure",  new Object[]{create_ASSE_HTSR_COLLECT_2});
+                ProcUtil.callProc(conn07,"sql_procedure",  new Object[]{"grant all on ASSE_HTSR_COLLECT_2 to public"});
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+
+
+
+
             LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
                     "基础政企ASSE_HTSR_COLLECT_2 ： "+zq_list
                     ,true);
@@ -382,7 +400,7 @@ public class CreateDateStep3_ALL {
                     ",a.RESERVER3\n" +
                     ",a.RESERVER4\n" +
                     ",a.RESERVER5\n" +
-                    " from ASSE_HTSR.ASSE_HTSR_COLLECT_2@icstax a where billing_cycle_id='"+lastMon+"'";
+                    " from DBUSR07.ASSE_HTSR_COLLECT_2@iamzwdb a where billing_cycle_id='"+lastMon+"'";
             if(sign.equals("test")){
                 insert = insert.replaceAll("ASSE_HTSR.ASSE_HTSR_COLLECT_2@icstax" , "dbusr07.ASSE_HTSR_COLLECT_2@zwdb_prod");
             }

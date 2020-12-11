@@ -256,8 +256,9 @@ public class FileHelp {
 
 //        FileHelp.deleteAllFile("D:\\bgusr01\\vip_backend\\files");
 //
-//        ArrayList<String> currentFileAllLocation = FileHelp.getCurrentFileAllLocation("C:\\Users\\Admin\\Desktop\\常用\\测试报告以及技术方案", ".*docx$");
-//        System.out.println(currentFileAllLocation);
+//        ArrayList<String> currentFileAllLocation = FileHelp.getCurrentFileAllLocation("D:\\file_temp\\wlw\\1029", ".*docx$");
+        ArrayList<String> currentFileAllLocation = FileHelp.getCurrentFileAllLocation("D:\\file_temp\\wlw\\1029", "BILL.*");
+        System.out.println(currentFileAllLocation);
     }
 
 }

@@ -1,7 +1,7 @@
 package helps;
 
 import com.alibaba.fastjson.JSONObject;
-import utils.HttpClientUtils;
+import utils.HttpClientHelps;
 
 import java.util.HashMap;
 
@@ -26,7 +26,7 @@ public  class WeChatHelp {
     public static String get_access_token(String currSecret){
         String acceptAccessTokenUrl = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid="+corpid
                 +"&corpsecret="+currSecret;
-        String s = HttpClientUtils.sendPostOrGet(acceptAccessTokenUrl, "");
+        String s = HttpClientHelps.sendPostOrGet(acceptAccessTokenUrl, "");
         JSONObject jsonObject = JSONObject.parseObject(s);
         String access_token = jsonObject.getString("access_token");
 
@@ -53,7 +53,7 @@ public  class WeChatHelp {
             String sendMessurl = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token="
                     +WeChatHelp.access_token;
             JSONObject jsonMsg = WeChatHelp.makeMsg(secret, msg);
-            HttpClientUtils.sendPostOrGet(sendMessurl,JSONObject.toJSONString(jsonMsg));
+            HttpClientHelps.sendPostOrGet(sendMessurl,JSONObject.toJSONString(jsonMsg));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -61,7 +61,7 @@ public  class WeChatHelp {
 
     public static void main(String[] args) {
         WeChatHelp.sendCompanyWeChatMsg(log_secret,"日志信息");
-        WeChatHelp.sendCompanyWeChatMsg(log_secret,"日志信息");
+//        WeChatHelp.sendCompanyWeChatMsg(log_secret,"日志信息");
 //        System.out.println("日志信息");
     }
 

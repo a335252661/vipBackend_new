@@ -38,7 +38,7 @@ public class CreateFileHelp extends Thread{
     private static PrintWriter pw = null;
     private static OutputStream os = null;
 
-    private static String split = "^";
+    private static String split = "$$";
 
     private static String yyyyMMdd = DateTimeHelp.getDateTimeString("yyyyMMdd");
 
@@ -59,7 +59,7 @@ public class CreateFileHelp extends Thread{
             iamConn = DBConn.getLocalConn();
             dirLocation = "D:\\file_temp\\CreateFileHelp\\";
             finaDir = "D:\\bgusr01\\vip_backend\\files\\";
-            limitTol = 100000L;
+            limitTol = 300000L;
         }
     }
 
@@ -145,7 +145,7 @@ public class CreateFileHelp extends Thread{
     public void createFile() {
         try {
             String str = String.format("%03d", currentFileOrder);
-            String currentFileName = "real_fee_021_" + yyyyMMdd + "_" + str + ".txt";
+            String currentFileName = "jt_bill_data_invoice_021_" + yyyyMMdd + "_" + str + ".txt";
             String location = dirLocation + currentFileName;
             //判断文件时候存在，不存在则创建
             UtilTools.judeFileExists(location);

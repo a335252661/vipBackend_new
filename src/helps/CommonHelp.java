@@ -1,5 +1,9 @@
 package helps;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import org.apache.commons.net.util.Base64;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
@@ -12,7 +16,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigDecimal;
 import java.security.MessageDigest;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -23,20 +27,7 @@ import java.util.zip.GZIPOutputStream;
  * @description:
  */
 public class CommonHelp {
-    public static void main(String[] args) {
-//        System.out.println("你好");
-//
-//        List list = new ArrayList();
-//        for(int i=0 ; i<1000 ; i++){
-//            list.add(i);
-//        }
-//
-//        List<List> lists = CommonHelp.subList2(list, 60);
-//        System.out.println("jieshu");
 
-        CommonHelp.screenshot("C:\\QrCode\\","jietu","jpg");
-
-    }
     /**
      * 从大集合中取等量数据
      *
@@ -352,6 +343,94 @@ public class CommonHelp {
             System.out.println(e);
         }
     }
+
+//    public void jsonToOracleCreateSQL(String jsonStrr) {
+//        JSONObject jsonObject = JSONObject.parseObject(jsonStrr);
+//        Iterator<String> keys = jsonObject.keySet().iterator();// jsonObject.keys();
+//        while (keys.hasNext()) {
+//            String key = keys.next();
+//            stringBuffer.append(key.toString()).append("|");
+//            if (jsonObject.get(key) instanceof JSONObject) {
+//                JSONObject innerObject = (JSONObject) jsonObject.get(key);
+//                stringBuffer.append(getAllKey(innerObject));
+//            } else if (jsonObject.get(key) instanceof JSONArray) {
+//                JSONArray innerObject = (JSONArray) jsonObject.get(key);
+//                stringBuffer.append(getAllKey(innerObject));
+//            }
+//        }
+//    }
+
+
+    public static  void getAllKey(String jsonStrr) {
+
+//        JSONObject jsonObject = JSONObject.parseObject(jsonStrr);
+
+        LinkedHashMap<String, Object> jsonMap = JSON.parseObject(jsonStrr, new TypeReference<LinkedHashMap<String, Object>>() {
+        });
+
+        for (Map.Entry<String, Object> entry : jsonMap.entrySet()) {
+            System.out.println(entry.getKey() + ":" + entry.getValue());
+
+        }
+
+//        Iterator<String> keys = jsonObject.keySet().iterator();// jsonObject.keys();
+//        while (keys.hasNext()) {
+//            String key = keys.next();
+//            System.out.println(key);
+//            if (jsonObject.get(key) instanceof JSONObject) {
+//                JSONObject innerObject = (JSONObject) jsonObject.get(key);
+//            } else if (jsonObject.get(key) instanceof JSONArray) {
+//                JSONArray innerObject = (JSONArray) jsonObject.get(key);
+////                stringBuffer.append(getAllKey(innerObject));
+//            }
+//        }
+
+    }
+
+    public static void main(String[] args) {
+
+        List<String> list = new ArrayList<String>() {
+            {
+                add("a");
+                add("b");
+            }};
+
+            String jsonStrr = "{\n" +
+                "    \"bankAccount\": \"\",\n" +
+                "    \"buyerAddress\": \"\",\n" +
+                "    \"buyerPhone\": \"\",\n" +
+                "    \"buyerTaxPayerId\": \"\",\n" +
+                "    \"invoiceHeader\": \"\",\n" +
+                "    \"invoiceId\": \"\",\n" +
+                "    \"issueId\": \"\",\n" +
+                "    \"lanId\": \"8310100\",\n" +
+                "    \"amounts\": \"39800\",\n" +
+                "    \"type\": \"1000\",\n" +
+                "    \"object\": [\n" +
+                "        {\n" +
+                "            \"id\": \"189113334035\",\n" +
+                "            \"productId\": \"111333\",\n" +
+                "            \"billMonth\": \"202007\",\n" +
+                "            \"amount\": \"19900\",\n" +
+                "            \"invoiceId\": \"\",\n" +
+                "            \"status\": \"2\"\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}";
+        CommonHelp.getAllKey(jsonStrr);
+    }
+
+
+    /**
+     * 包含两个方法的HelloWorld接口
+     */
+    interface HelloWorld {
+        public void greet();
+        public void greetSomeone(String someone);
+    }
+
+
+
 
 
 

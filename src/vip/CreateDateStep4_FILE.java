@@ -2,9 +2,7 @@ package vip;
 
 
 import helps.*;
-import org.apache.commons.lang.StringUtils;
 import utils.*;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -36,6 +34,7 @@ public class CreateDateStep4_FILE {
 
     //数据库连接
     private static Connection iamConn = null;
+//    private static Connection bssConn = DBConn.getBssConn();
 
 
     static{
@@ -43,10 +42,9 @@ public class CreateDateStep4_FILE {
             iamConn = DBConn.getDbusr07ProConn();
             dirLocation = "/home/bgusr01/vip_backend/2.1new/";
             finaDir = "/home/bgusr01/vip_backend/files/";
-
             limitTol = 100000L;
         }else {
-            iamConn = DBConn.getDbusr07TestConn();
+            iamConn = DBConn.getCopyTestConn();
             dirLocation = "D:\\bgusr01\\vip_backend\\2.1new\\";
             finaDir = "D:\\bgusr01\\vip_backend\\files\\";
             limitTol = 10L;
@@ -273,6 +271,9 @@ public class CreateDateStep4_FILE {
                     "程序运行时间 ：" + runTime+
                     "生产的文件总数"+fileTol+",文件生成所在的位置 ： "+dirLocation;
 
+            LogHelp.insertCldLogsPro(iamConn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
+                    msg,true);
+
 //            WeChatHelp.sendCompanyWeChatMsg(WeChatHelp.log_secret,msg);
 
 
@@ -281,6 +282,19 @@ public class CreateDateStep4_FILE {
 //                    "chengliudegg@163.com",
 //                    "chengliudegg@163.com",
 //                    null);
+
+
+            //开启数据备份
+//            String yyyyMM = DateTimeHelp.getDateTimeString("yyyyMM");
+//            String tableName = "MBI_"+yyyyMM;
+//            String bsstable = "create table "+tableName+" AS  select * from dbusr07.cld_temp_data_all_new@zwdb";
+//            try{
+//                ProcUtil.callProc(bssConn,"sql_procedure",  new Object[]{bsstable});
+//                ProcUtil.callProc(bssConn,"sql_procedure",  new Object[]{"grant all on tableName to public"});
+//                ProcUtil.callProc(bssConn,"sql_procedure",  new Object[]{"create index msisdn_index_"+yyyyMM+" on  "+tableName+"(msisdn)"});
+//            }catch (Exception e){
+//                e.printStackTrace();
+//            }
 
         }
 
@@ -306,7 +320,8 @@ public class CreateDateStep4_FILE {
         String product_offer_inst_id = rstInst.getString("product_offer_inst_id");
 
         String acct_id = rstInst.getString("acct_id");
-        String acct_id_new = this.checkNull(acct_id ,acct_id);
+        String acct_id_new = rstInst.getString("acct_id_new");
+        String acct_id_new2 = this.checkNull(acct_id_new ,acct_id);
 
         String cust_id = rstInst.getString("cust_id_new");
 //        String crm_acct_id = rstInst.getString("crm_acct_id");
@@ -353,7 +368,7 @@ public class CreateDateStep4_FILE {
         String reserver5 = rstInst.getString("reserver5");
 
         String s =msisd + "|" + serv_id + "|" + prod_inst_id_new + "|" + product_offer_id_new + "|" +
-                product_offer_inst_id + "|" + acct_id_new + "|" + cust_id + "|" + acct_id_new + "|" +
+                product_offer_inst_id + "|" + acct_id_new2 + "|" + cust_id + "|" + acct_id_new2 + "|" +
                 billing_cycle_id + "|" + billing_cycle_id_ori + "|" + charge + "|" + item_source + "|" +
                 biz_type + "|" + acct_item_list + "|" + acct_item_type_id + "|" + acct_item_name + "|" +
                 billing_mode + "|" + acc_nbr + "|" + cdr_key + "|" + rome_type + "|" +
