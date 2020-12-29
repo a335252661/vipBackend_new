@@ -19,41 +19,27 @@ import java.util.concurrent.ExecutorService;
  * @date 2020/12/29
  */
 public class IdcLoad {
-//    //@Value("${idcLoad.bakFilePath}")
-    private String bakFilePath = "/acct/acct_payment/JtBill/data/IDC/chk/bak/";
-
-    //@Value("${idcLoad.billFilePath}")
-    private String billFilePath = "/acct/acct_payment/JtBill/data/IDC/invoice/";
-
-    //@Value("${idcLoad.delimiter}")
     private String delimiter ="\\|";
-
-    //@Value("${idcLoad.serviceType}")
     private String serviceType ="4";
-
-    //@Value("${idcLoad.createStaff}")
     private Long createStaff = 365895214L;
-
-    //@Value("${idcLoad.chgWho}")
     private String chgWho = "system";
-
-    //@Value("${idcCheck.chkFilePath}")
-    private String chkFilePath ="/acct/acct_payment/JtBill/data/IDC/chk/";
-
-    //@Value("${idcCheck.chkFileRegExp}")
     private String chkFileRegExp =".*SUM.*.021";
-
-    //@Value("${idcCheck.billFileRegExp}")
     private String billFileRegExp =".*";
 
-    //@Value("${idcCheck.origFilePath}")
+    private String chkFilePath ="/acct/acct_payment/JtBill/data/IDC/chk/";
     private String origFilePath ="/acct/acct_payment/JtBill/data/IDC/chk/orig/";
-
-    //@Value("${idcCheck.rejectFilePath}")
     private String rejectFilePath ="/acct/acct_payment/JtBill/data/IDC/chk/rej/";
-
-    //@Value("${idcCheck.errFilePath}")
     private String errFilePath ="/acct/acct_payment/JtBill/data/IDC/chk/err/";
+    private String bakFilePath = "/acct/acct_payment/JtBill/data/IDC/chk/bak/";
+    private String billFilePath = "/acct/acct_payment/JtBill/data/IDC/invoice/";
+
+//    private String chkFilePath ="D:\\file_temp\\home\\bgusr01\\payment\\JtBill\\data\\IDC\\chk\\";
+//    private String origFilePath ="D:\\file_temp\\home\\bgusr01\\payment\\JtBill\\data\\IDC\\chk\\orig\\";
+//    private String rejectFilePath ="D:\\file_temp\\home\\bgusr01\\payment\\JtBill\\data\\IDC\\chk/rej\\";
+//    private String errFilePath ="D:\\file_temp\\home\\bgusr01\\payment\\JtBill\\data\\IDC\\chk/err\\";
+//    private String bakFilePath = "D:\\file_temp\\home\\bgusr01\\payment\\JtBill\\data\\IDC\\chk/bak\\";
+//    private String billFilePath = "D:\\file_temp\\home\\bgusr01\\payment\\JtBill\\data\\IDC\\invoice\\";
+
     public static void main(String[] args) {
         IdcLoad idcLoad = new IdcLoad();
         idcLoad.check();
@@ -73,8 +59,8 @@ public class IdcLoad {
             for(File theFile:chkFiles){
                 //File theFile = chkFiles.get(0);
                 try {
-//                    iamRepConn = oracleCopyDataSource.getConnection() ; //复制库
                     iamRepConn = DBConn.getCopyProConn();
+//                    iamRepConn = DBConn.getDbusr01TestConn();
                     long batchNo = JtBillLog.getSeq(iamRepConn);
                     iamRepConn.setAutoCommit(false);
 
@@ -182,8 +168,8 @@ public class IdcLoad {
         String yyyyMM = BaseUtil.getCurrentDate(BaseUtil.MONTH_PATTERN1);
         ExecutorService service = null;
         try {
-//            iamRepConn = oracleCopyDataSource.getConnection() ;
             iamRepConn = DBConn.getCopyProConn();
+//            iamRepConn = DBConn.getDbusr01TestConn();
             List<JtBillLog> jtBills = JtBillLog.query(iamRepConn, "0","2,8",serviceType);
 
             StringBuffer sql = new StringBuffer();
@@ -223,7 +209,6 @@ public class IdcLoad {
 
 
             iamRepConn.setAutoCommit(false);
-            iamConn.setAutoCommit(false);
             ps = iamRepConn.prepareStatement(sql.toString());
             //AccountManager acctMgr = new AccountManager(iamConn,hssConn);
             for(JtBillLog jtBill:jtBills){
@@ -301,7 +286,6 @@ public class IdcLoad {
             ex.printStackTrace();
             XxlJobLogger.log( "IdcBillLoad error msg:" + ex.getLocalizedMessage());
         }  finally {
-            WlwJdbcUtil.close(iamConn);
             WlwJdbcUtil.close(hssConn);
             WlwJdbcUtil.close(iamRepConn);
             if(service != null){
