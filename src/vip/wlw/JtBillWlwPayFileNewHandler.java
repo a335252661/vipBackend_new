@@ -1,5 +1,6 @@
 package vip.wlw;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 //import com.xxl.job.core.biz.model.ReturnT;
 //import com.xxl.job.core.handler.IJobHandler;
@@ -13,15 +14,20 @@ import com.alibaba.fastjson.JSONArray;
 //import com.xxl.job.executor.entity.PayInterimBillEntity;
 //import com.xxl.job.executor.entity.SystemParameters;
 //import com.xxl.job.executor.utils.*;
+import com.alibaba.fastjson.JSONObject;
 import helps.FileHelp;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 //import org.springframework.http.HttpMethod;
 //import org.springframework.stereotype.Component;
+import org.springframework.http.HttpMethod;
 import utils.DBConn;
 import utils.FtpUtil;
+import utils.HttpClientHelps;
+import utils.UtilTools;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -61,14 +67,17 @@ public class JtBillWlwPayFileNewHandler {
 	private String serviceType ="1";
 	
 //	@Value("${wlwPay.payFilePath}")
-	private String payFilePath ="/acct/acct_other/vip_backend/wlw/";
-	
+	private String payFilePath ="/acct/acct_payment/JtBill/data/wlw/pay/";
+//	private String payFilePath ="D:\\file_temp\\wlw\\paytest\\";
+
 //	@Value("${wlwPay.tmpPayFilePath}")
-	private String tmpPayFilePath ="/acct/acct_other/vip_backend/wlw/tmp/";
-	
+	private String tmpPayFilePath ="/acct/acct_payment/JtBill/data/wlw/pay/tmp/";
+//	private String tmpPayFilePath ="D:\\file_temp\\wlw\\paytest\\tmp\\";
+
 //	@Value("${wlwPay.tmpPayFilePath1}")
-	private String tmpPayFilePath1 ="/acct/acct_other/vip_backend/wlw/tmp1/";
-	
+	private String tmpPayFilePath1 ="/acct/acct_payment/JtBill/data/wlw/pay/tmp1/";
+//	private String tmpPayFilePath1 ="D:\\file_temp\\wlw\\paytest\\tmp1\\";
+
 //	@Value("${wlwPay.delimiter}")
 	private String delimiter ="|";
 	
@@ -84,6 +93,8 @@ public class JtBillWlwPayFileNewHandler {
 	private String parameterName ;
 	private String chkParameterName ;
 	private String yyyyMMdd = null;
+
+	private String acct_biz_bill_payInoviceFindBybrn = "http://10.145.167.212:8063/acct/acctbizbill/payInoviceFindBybrn";
 
 	public static void main(String[] args) {
 		new JtBillWlwPayFileNewHandler().run();
@@ -106,7 +117,7 @@ public class JtBillWlwPayFileNewHandler {
 
 			isFinish = false;
 			Connection iamRepConn = null;
-			Connection mysqlConn = null ;
+
 			PayInterimBillEntity interimBill = null;
 			BillInvoiceDTO invoice = null;
 			List<JtBillData> billDatas = null;
@@ -118,83 +129,75 @@ public class JtBillWlwPayFileNewHandler {
 			List<List<String>> files = new ArrayList<List<String>>();
 			List<List<String>> files2 = new ArrayList<List<String>>();
 			try{
-//				iamRepConn = oracleCopyDataSource.getConnection() ;
-//				mysqlConn = mysqlDataSource.getConnection() ;
-
 				iamRepConn = DBConn.getCopyProConn();
-				mysqlConn = DBConn.getCopyMySQLProConn() ;
-
-
-
-//
-//
+//				iamRepConn = DBConn.getCollTestConn();
 				iamRepConn.setAutoCommit(false);
-				mysqlConn.setAutoCommit(false);
-//				XxlJobLogger.log("跟新service_type===================start");
-//				String queryseq = "select distinct a.pay_interim_seq, b.service_type\n" +
-//						"  from JT_BILL_DATA_INVOICE a, jt_bill_data b\n" +
-//						" where  a.pay_interim_seq = b.pay_interim_seq and a.service_type=999";
-//				ResultSet queryseq_payResult = iamRepConn.createStatement().executeQuery(queryseq);
-//				while (queryseq_payResult.next()){
-//					String pay_interim_seq = queryseq_payResult.getString("pay_interim_seq");
-//					String service_type =queryseq_payResult.getString("service_type");
-//					String up = "update JT_BILL_DATA_INVOICE set service_type='"+service_type+"' where pay_interim_seq='"+pay_interim_seq+"'";
-//					PreparedStatement pre = iamRepConn.prepareStatement(up);
-//					pre.execute();
-//					pre.close();
-//				}
-//				XxlJobLogger.log("跟新service_type===================end");
-//
-//
-//				List<JtBillDataInvoice> invs = JtBillDataInvoice.queryLoad(iamRepConn, serviceType, null, null);
-//				if ("4".equals(this.serviceType)) {
-//					List<JtBillDataInvoice> invs5 = JtBillDataInvoice.queryLoad(iamRepConn, "5", (String)null, (String)null);//云堤
-//					List<JtBillDataInvoice> invs6 = JtBillDataInvoice.queryLoad(iamRepConn, "6", (String)null, (String)null);//云录音
-//					invs.addAll(invs5);
-//					invs.addAll(invs6);
-//				}
-//				for(JtBillDataInvoice inv:invs){
-//					//0:新建 1:账单生成 2：未销账，3：已销帐，4：返销账
-//					if(0 == inv.getStatus()) {
-//						if(5==inv.getServiceType() || 6==inv.getServiceType()){
-//							if(StringUtils.isNotEmpty(inv.getBillRefNo())){
-//								inv.setBillRefNo(inv.getBillRefNo());
-//								inv.setStatus(1);
-//							}
-//						}else{
-//							//判断是否生成账单
+
+				XxlJobLogger.log("跟新service_type===================start");
+				String queryseq = "select distinct a.pay_interim_seq, b.service_type\n" +
+						"  from JT_BILL_DATA_INVOICE a, jt_bill_data b\n" +
+						" where  a.pay_interim_seq = b.pay_interim_seq and a.service_type=999";
+				ResultSet queryseq_payResult = iamRepConn.createStatement().executeQuery(queryseq);
+				while (queryseq_payResult.next()){
+					String pay_interim_seq = queryseq_payResult.getString("pay_interim_seq");
+					String service_type =queryseq_payResult.getString("service_type");
+					String up = "update JT_BILL_DATA_INVOICE set service_type='"+service_type+"' where pay_interim_seq='"+pay_interim_seq+"'";
+					PreparedStatement pre = iamRepConn.prepareStatement(up);
+					pre.execute();
+					pre.close();
+				}
+				XxlJobLogger.log("跟新service_type===================end");
+
+				List<JtBillDataInvoice>  invs = JtBillDataInvoice.queryLoad(iamRepConn, serviceType, null, null);
+				if ("4".equals(this.serviceType)) {
+					List<JtBillDataInvoice> invs5 = JtBillDataInvoice.queryLoad(iamRepConn, "5", (String)null, (String)null);//云堤
+					List<JtBillDataInvoice> invs6 = JtBillDataInvoice.queryLoad(iamRepConn, "6", (String)null, (String)null);//云录音
+					invs.addAll(invs5);
+					invs.addAll(invs6);
+				}
+				for(JtBillDataInvoice inv:invs){
+					//0:新建 1:账单生成 2：未销账，3：已销帐，4：返销账
+					if(0 == inv.getStatus()) {
+						if(5==inv.getServiceType() || 6==inv.getServiceType()){
+							if(StringUtils.isNotEmpty(inv.getBillRefNo())){
+								inv.setBillRefNo(inv.getBillRefNo());
+								inv.setStatus(1);
+							}
+						}else{
+							//判断是否生成账单
 //							interimBill = PayInterimBillEntity.query(inv.getPayInterimSeq());
-//							if(null != interimBill && 13 == interimBill.getStatusCd()){
-//								inv.setBillRefNo(interimBill.getBillRefNo());
-//								inv.setStatus(1);
-//							}
-//						}
-//					} else if(1 != inv.getStatus() && 2 != inv.getStatus() && 4 != inv.getStatus()) {
-//						//判断是否销帐
-//						if (3 == inv.getStatus()) {
-//							invoice = queryInvoiceByBillRef(inv.getBillRefNo());
-//							if (invoice != null && 0L != invoice.getBalanceDue()) {
-//								inv.setStatus(4);
-//								inv.setLoadFlag(1);
-//							}
-//						}
-//					} else if(StringUtils.isNotEmpty(inv.getBillRefNo())) {
-//						//判断是否返销帐
-//						invoice = queryInvoiceByBillRef(inv.getBillRefNo());
-//						if (invoice != null) {
-//							if (0L == invoice.getBalanceDue()) {
-//								inv.setStatus(3);
-//								inv.setLoadFlag(1);
-//								String postDate = BaseUtil.Date2String(invoice.getCloseDate(), BaseUtil.DATETIME_PATTERN) ;
-//								inv.setPostDate(postDate);
-//							} else if (4 != inv.getStatus()) {
-//								inv.setStatus(2);
-//							}
-//						}
-//					}
-//					inv.update(iamRepConn);
-//				}
-//				iamRepConn.commit();
+							String bill_ref_no  = PayInterimBillEntity.query2(inv.getPayInterimSeq() , iamRepConn);
+							if(!"".equals(bill_ref_no)){
+								inv.setBillRefNo(bill_ref_no);
+								inv.setStatus(1);
+							}
+						}
+					} else if(1 != inv.getStatus() && 2 != inv.getStatus() && 4 != inv.getStatus()) {
+						//判断是否销帐
+						if (3 == inv.getStatus()) {
+							invoice = queryInvoiceByBillRef(inv.getBillRefNo());
+							if (invoice != null && 0L != invoice.getBalanceDue()) {
+								inv.setStatus(4);
+								inv.setLoadFlag(1);
+							}
+						}
+					} else if(StringUtils.isNotEmpty(inv.getBillRefNo())) {
+						//判断是否返销帐
+						invoice = queryInvoiceByBillRef(inv.getBillRefNo());
+						if (invoice != null) {
+							if (0L == invoice.getBalanceDue()) {
+								inv.setStatus(3);
+								inv.setLoadFlag(1);
+								String postDate = BaseUtil.Date2String(invoice.getCloseDate(), BaseUtil.DATETIME_PATTERN) ;
+								inv.setPostDate(postDate);
+							} else if (4 != inv.getStatus()) {
+								inv.setStatus(2);
+							}
+						}
+					}
+					inv.update(iamRepConn);
+				}
+				iamRepConn.commit();
 
 				XxlJobLogger.log("销账表跟新完毕,开始生成销账文件");
 				System.out.println("销账表跟新完毕,开始生成销账文件");
@@ -204,13 +207,27 @@ public class JtBillWlwPayFileNewHandler {
 
 				String pay = "  select rownum  id ,b.PAY_INTERIM_SEQ, a.acct_id ,'-1' serv_id,a.serv_id as SERV,'021' AS SH , a.BILLING_MONTH ,\n   a.SUB_TYPE_CODE , a.AMOUNT ,to_char(b.post_date , 'yyyymmddhh24miss') postdate,\n   case when b.status =3 then '5JB'\n     else '5JA'  END AS STATUS\n  from jt_bill_data a, JT_BILL_DATA_INVOICE b\n  where a.PAY_INTERIM_SEQ = b.PAY_INTERIM_SEQ\n  and b.load_flag=1\n  and a.EXPENSES_ID  is  null  and b.SERVICE_TYPE = " + this.serviceType;
 				String partpay = "  select rownum  id ,b.PAY_INTERIM_SEQ, a.acct_id ,'-1' serv_id,a.serv_id as SERV,'021' AS SH , a.BILLING_MONTH ,\n   a.SUB_TYPE_CODE , a.AMOUNT ,to_char(b.post_date , 'yyyymmddhh24miss') postdate,\n   case when b.status =3 then '5JB'\n     else '5JA'  END AS STATUS\n   , a.EXPENSES_ID , \n   '021' || to_char(sysdate , 'yyyymmddhh24miss') || lpad(rownum,8,'0') || '00' as xznum \n  from jt_bill_data a, JT_BILL_DATA_INVOICE b\n  where a.PAY_INTERIM_SEQ = b.PAY_INTERIM_SEQ\n  and b.load_flag=1\n  and a.EXPENSES_ID  is not null and b.SERVICE_TYPE = " + this.serviceType;
+
+//				String pay = "  select rownum  id ,b.PAY_INTERIM_SEQ, a.acct_id ,'-1' serv_id,a.serv_id as SERV,'021' AS SH , a.BILLING_MONTH ,\n   a.SUB_TYPE_CODE , a.AMOUNT ,to_char(b.post_date , 'yyyymmddhh24miss') postdate,\n   case when b.status =3 then '5JB'\n     else '5JA'  END AS STATUS\n  from jt_bill_data@to_iamzw_new a, JT_BILL_DATA_INVOICE@to_iamzw_new b\n  where a.PAY_INTERIM_SEQ = b.PAY_INTERIM_SEQ\n  and b.load_flag=1\n  and a.EXPENSES_ID  is  null  and b.SERVICE_TYPE = " + this.serviceType;
+//				String partpay = "  select rownum  id ,b.PAY_INTERIM_SEQ, a.acct_id ,'-1' serv_id,a.serv_id as SERV,'021' AS SH , a.BILLING_MONTH ,\n   a.SUB_TYPE_CODE , a.AMOUNT ,to_char(b.post_date , 'yyyymmddhh24miss') postdate,\n   case when b.status =3 then '5JB'\n     else '5JA'  END AS STATUS\n   , a.EXPENSES_ID , \n   '021' || to_char(sysdate , 'yyyymmddhh24miss') || lpad(rownum,8,'0') || '00' as xznum \n  from jt_bill_data@to_iamzw_new a, JT_BILL_DATA_INVOICE@to_iamzw_new b\n  where a.PAY_INTERIM_SEQ = b.PAY_INTERIM_SEQ\n  and b.load_flag=1\n  and a.EXPENSES_ID  is not null and b.SERVICE_TYPE = " + this.serviceType;
+
+
 				List<String> payList = Arrays.asList("id", "acct_id", "serv_id", "SERV", "sh", "BILLING_MONTH", "SUB_TYPE_CODE", "AMOUNT", "postdate", "STATUS");
 				List<String> partpayList = Arrays.asList("id", "acct_id", "serv_id", "SERV", "sh", "BILLING_MONTH", "SUB_TYPE_CODE", "AMOUNT", "postdate", "STATUS", "EXPENSES_ID", "xznum");
 				HashSet<String> hashSet = new HashSet();
 
+
 				Statement state = iamRepConn.createStatement();
 				ResultSet payResult = state.executeQuery(pay);
 				while (payResult.next()){
+
+					++index;
+					if(index>fileCount){
+						files.add(contents);
+						index=1;
+						contents = new ArrayList<String>();
+					}
+
 					StringBuffer content = new StringBuffer();
 					for(String comment : payList){
 						String value  = payResult.getString(comment);
@@ -221,17 +238,21 @@ public class JtBillWlwPayFileNewHandler {
 					contents.add(content.toString());
 				}
 				System.out.println("pay  执行结束");
-//				if(null!=state){
-//					state.close();
-//				}
-//				if(null!=payResult){
-//					payResult.close();
-//				}
+
+
 
 
 				Statement state2 = iamRepConn.createStatement();
 				ResultSet payResult2 = state2.executeQuery(partpay);
 				while (payResult2.next()){
+
+					++index2;
+					if(index2>fileCount){
+						files2.add(contents2);
+						index2=1;
+						contents2 = new ArrayList<String>();
+					}
+
 					StringBuffer content2 = new StringBuffer();
 					for(String comment : partpayList){
 						String value2  = payResult2.getString(comment);
@@ -262,6 +283,10 @@ public class JtBillWlwPayFileNewHandler {
 					files2.add(contents2);
 				}
 
+
+
+				Connection mysqlConn = DBConn.getCopyMySQLProConn() ;
+				mysqlConn.setAutoCommit(false);
 				Long chkParam = SystemParameters.queryIntValue(mysqlConn, module, chkParameterName, yyyyMMdd);
 				int chkFileNum = 0;
 				if(null != chkParam){
@@ -280,6 +305,11 @@ public class JtBillWlwPayFileNewHandler {
 				if(null != paramPart){
 					fileNumPart = paramPart.intValue();
 				}
+				mysqlConn.commit();
+				mysqlConn.close();
+
+
+
 
 				if(files.size() > 0 && files2.size()>0) {
 					int fs1=files.size();
@@ -427,14 +457,19 @@ public class JtBillWlwPayFileNewHandler {
 //				FileUtil.moveAllFile(tmpPayFilePath1, payFilePath);
 				FileHelp.dirToDir(tmpPayFilePath1, payFilePath);
 
+
+
+
+				Connection mysqlConn2 = DBConn.getCopyMySQLProConn() ;
+				mysqlConn2.setAutoCommit(false);
 				//更新帐单文件序号
-				updateParam(mysqlConn,module,parameterName,String.valueOf(fileNum),yyyyMMdd,param);
-				updateParam(mysqlConn,modulePart,parameterName,String.valueOf(fileNumPart),yyyyMMdd,paramPart);
+				updateParam(mysqlConn2,module,parameterName,String.valueOf(fileNum),yyyyMMdd,param);
+				updateParam(mysqlConn2,modulePart,parameterName,String.valueOf(fileNumPart),yyyyMMdd,paramPart);
 
 				//更新稽核单文件序号
-				updateParam(mysqlConn,module,chkParameterName,String.valueOf(chkFileNum),yyyyMMdd,chkParam);
-				mysqlConn.commit();
-
+				updateParam(mysqlConn2,module,chkParameterName,String.valueOf(chkFileNum),yyyyMMdd,chkParam);
+				mysqlConn2.commit();
+				mysqlConn2.close();
 
 //				System.out.println("77---》75  移动文件");
 //				FtpUtil ftp = FtpUtil.connect("10.145.195.75","acct_pay","Pay!3#we",
@@ -452,12 +487,10 @@ public class JtBillWlwPayFileNewHandler {
 				XxlJobLogger.log("XxlJobLogger.log  err:"+ex.getMessage());
 				ex.printStackTrace();
 				try {
-					mysqlConn.rollback();
 					iamRepConn.rollback();
 				} catch (SQLException e) {}
 			} finally {
 				isFinish = true;
-				WlwJdbcUtil.close(mysqlConn);
 				WlwJdbcUtil.close(iamRepConn);
 			}
 		}
@@ -466,8 +499,10 @@ public class JtBillWlwPayFileNewHandler {
 
 	private void updateParam(Connection mysqlConn, int module, String parameterName, String fileNum, String yyyyMM, Long param) throws Exception {
 		if(null == param){
+			System.out.println("insert");
 			SystemParameters.insert(mysqlConn, module, parameterName, fileNum, yyyyMM);
 		} else {
+			System.out.println("update");
 			SystemParameters.update(mysqlConn, module, parameterName, fileNum, yyyyMM);
 		}
 	}
@@ -490,19 +525,19 @@ public class JtBillWlwPayFileNewHandler {
 	}
 	
 	
-//	public BillInvoiceDTO queryInvoiceByBillRef(String billRefNo) {
+	public BillInvoiceDTO queryInvoiceByBillRef(String billRefNo) {
 //		   Map<String, String> map = new HashMap<String, String>();
 //	        map.put("billRefNo", billRefNo);
 //	        map.put("requestSeq", UtilTools.generateRequestId());
 //	        map.put("requestTime", BaseUtil.format(new Date(), BaseUtil.DATETIME_PATTERN));
-//
-//	        String jsonArrayStr = httpClientUtils.exchange(acct_biz_bill_payInoviceFindBybrn, HttpMethod.GET, null, String.class, map);
-//	        List<BillInvoiceDTO> tbPrdList = JSONArray.parseArray(jsonArrayStr, BillInvoiceDTO.class);
-//	        if(tbPrdList != null && tbPrdList.size() > 0) {
-//	        	return tbPrdList.get(0) ;
-//	        }
-//	        return null ;
-//	}
+//			String json=JSON.toJSONString(map);
+	        String jsonArrayStr = HttpClientHelps.sendGet(acct_biz_bill_payInoviceFindBybrn+"?billRefNo="+billRefNo+"&requestSeq="+UtilTools.generateRequestId()+"&requestTime=1");
+	        List<BillInvoiceDTO> tbPrdList = JSONArray.parseArray(jsonArrayStr, BillInvoiceDTO.class);
+	        if(tbPrdList != null && tbPrdList.size() > 0) {
+	        	return tbPrdList.get(0) ;
+	        }
+	        return null ;
+	}
 	
 	
 	/**
@@ -543,7 +578,6 @@ public class JtBillWlwPayFileNewHandler {
 				sb.append(",");
 			}
 		}
-
 		return sb.toString().trim();
 	}
 

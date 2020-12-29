@@ -64,7 +64,38 @@ public class UtilTools {
 		SimpleDateFormat dateTimeSf = new SimpleDateFormat(fromat);
 		return dateTimeSf.format(date);
 	}
-	
+
+	/**
+	 * 获取请求流水号
+	 *
+	 * @return String
+	 */
+	public static String generateRequestId() {
+		Date currentTime = new Date();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+		String dateString = formatter.format(currentTime);
+		return "IAM" + dateString + getRandom();
+	}
+
+	/**
+	 * 获取随机数:线程编号+随机数共10位
+	 *
+	 * @return String
+	 */
+	private static String getRandom() {
+		String randStr = "";
+		String threadId = String.valueOf(Thread.currentThread().getId());
+		int len = threadId.length();
+		if (len >= 10)
+			threadId = threadId.substring(len - 10);
+		else {
+			for (int i = 0; i < 10 - len; i++) {
+				randStr = randStr + (int) (Math.random() * 10.0D);
+			}
+		}
+		return threadId + randStr;
+	}
+
 	/**
 	 * 返回当前日期
 	 * @param s

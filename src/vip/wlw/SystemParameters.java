@@ -1,6 +1,8 @@
 package vip.wlw;
 
 
+import helps.SQLHelp;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -82,21 +84,27 @@ public class SystemParameters {
     }
 	
 	public static void update(Connection mysqlConn, int module, String parameterName, String defaultValue, String enumValue) throws Exception {
-    	int index = 0;
-        PreparedStatement stmt = null;
-        StringBuffer sql = new StringBuffer();
-        sql.append("update param_config set DEFAULT_VALUE = ? ,ENUM_VALUE = ?");
-        sql.append(" where PARAM_TYPE=? and PARAM_NAME = ? ");
-        try {
-            stmt = mysqlConn.prepareStatement(sql.toString());
-            stmt.setString(++index,defaultValue);
-            stmt.setString(++index,enumValue);
-            stmt.setInt(++index,module);
-            stmt.setString(++index,parameterName);
-            stmt.executeUpdate();
-        } finally {
-        	WlwJdbcUtil.close(stmt);
-        }
+//    	int index = 0;
+//        PreparedStatement stmt = null;
+//        StringBuffer sql = new StringBuffer();
+//        sql.append("update param_config set DEFAULT_VALUE = ? ,ENUM_VALUE = ?");
+//        sql.append(" where PARAM_TYPE=? and PARAM_NAME = ? ");
+//        try {
+//            stmt = mysqlConn.prepareStatement(sql.toString());
+//            stmt.setString(++index,defaultValue);
+//            stmt.setString(++index,enumValue);
+//            stmt.setInt(++index,module);
+//            stmt.setString(++index,parameterName);
+//            stmt.executeUpdate();
+//        } finally {
+//        	WlwJdbcUtil.close(stmt);
+//        }
+
+        String sqlup = "update param_config set DEFAULT_VALUE = '"+defaultValue+"' ,ENUM_VALUE = '"+enumValue+"' where PARAM_TYPE='"+module+"' and PARAM_NAME = '"+parameterName+"' "+" limit 99999";
+
+
+		SQLHelp.updateSQL(mysqlConn , sqlup);
+
     }
 	
 	public static void updateDefaultValue(Connection mysqlConn, int module, String parameterName, String defaultValue, String enumValue) throws Exception {
@@ -118,21 +126,25 @@ public class SystemParameters {
     }
 	  
 	public static void insert(Connection mysqlConn, int module, String parameterName, String defaultValue, String enumValue) throws Exception {
-    	int index = 0;
-        PreparedStatement stmt = null;
-        StringBuffer sql = new StringBuffer();
-        sql.append("insert into param_config(PARAM_ID,PARAM_TYPE,PARAM_NAME,DEFAULT_VALUE,ENUM_VALUE)");
-        sql.append(" values(param_config_seq.nextval,?,?,?,?) ");
-        try {
-            stmt = mysqlConn.prepareStatement(sql.toString());
-            stmt.setInt(++index,module);
-            stmt.setString(++index,parameterName);
-            stmt.setString(++index,defaultValue);
-            stmt.setString(++index,enumValue);
-            stmt.executeUpdate();
-        } finally {
-        	WlwJdbcUtil.close(stmt);
-        }
+//    	int index = 0;
+//        PreparedStatement stmt = null;
+//        StringBuffer sql = new StringBuffer();
+//        sql.append("insert into param_config(PARAM_ID,PARAM_TYPE,PARAM_NAME,DEFAULT_VALUE,ENUM_VALUE)");
+//        sql.append(" values(param_config_seq.nextval,?,?,?,?) ");
+//        try {
+//            stmt = mysqlConn.prepareStatement(sql.toString());
+//            stmt.setInt(++index,module);
+//            stmt.setString(++index,parameterName);
+//            stmt.setString(++index,defaultValue);
+//            stmt.setString(++index,enumValue);
+//            stmt.executeUpdate();
+//        } finally {
+//        	WlwJdbcUtil.close(stmt);
+//        }
+        String in = "insert into param_config(PARAM_ID,PARAM_TYPE,PARAM_NAME,DEFAULT_VALUE,ENUM_VALUE) values(param_config_seq.nextval,'"+module+"','"+parameterName+"','"+defaultValue+"'," +
+				"'"+enumValue+"')";
+        SQLHelp.insertSQL(mysqlConn,in);
+
     }
 	
 	public static SystemParameters queryValue(Connection mysqlConn, String module, String parameterName) throws Exception {

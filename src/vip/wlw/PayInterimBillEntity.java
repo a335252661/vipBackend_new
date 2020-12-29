@@ -4,8 +4,11 @@
 package vip.wlw;
 
 
+import helps.SQLHelp;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -450,22 +453,25 @@ public class PayInterimBillEntity {
         }
     }*/
     
-//    public static PayInterimBillEntity query(long seq) throws Exception {
-//    	PayInterimBillEntity entity = null;
-//		String sql = "SELECT\n" +
-//				"	SEQ, ACCT_ID, TRANS_TYPE, CREATE_STAFF, REQ_OFFICE_ID, STATUS_CD, SOURCE_TYPE, UPDATE_STAFF, UPDATE_DATE, REMARK, BILL_REF_NO,\n" +
-//				"	DATE_FORMAT( PAYMENT_DUE_DATE, '%Y-%m-%d' ) PAYMENT_DUE_DATE, DATE_FORMAT ( CREATE_DATE, '%Y-%m-%d %H:%m:%s') CREATE_DATE\n" +
-//				"FROM\n" +
-//				"	PAY_INTERIM_BILL\n" +
-//				"WHERE seq = ?" ;
-//		try {
-//			List<PayInterimBillEntity> list = JdbcTemplateSelector.queryForList(sql, new Long[] {seq}, PayInterimBillEntity.class, 20) ;
-//			entity = list.get(0) ;
-//		} catch (Exception e) {
-//			throw e;
-//		}
-//		return entity;
-//	}
+
+	public static String query2(long seq , Connection conn) throws Exception {
+		String BILL_REF_NO = "";
+		String sql = "SELECT\n" +
+				"	SEQ, ACCT_ID, TRANS_TYPE, CREATE_STAFF, REQ_OFFICE_ID, STATUS_CD, SOURCE_TYPE, UPDATE_STAFF, UPDATE_DATE, REMARK, BILL_REF_NO,\n" +
+				"	DATE_FORMAT( PAYMENT_DUE_DATE, '%Y-%m-%d' ) PAYMENT_DUE_DATE, DATE_FORMAT ( CREATE_DATE, '%Y-%m-%d %H:%m:%s') CREATE_DATE\n" +
+				"FROM\n" +
+				"	PAY_INTERIM_BILL\n" +
+				"WHERE seq = "+seq+"  and status=13 " ;
+		try {
+			List<LinkedHashMap<String, Object>> linkedHashMaps = SQLHelp.querySQLReturnList(conn, sql);
+			if(linkedHashMaps.size()>0){
+				 BILL_REF_NO = linkedHashMaps.get(0).get("BILL_REF_NO").toString();
+			}
+		} catch (Exception e) {
+			throw e;
+		}
+		return BILL_REF_NO;
+	}
     
 	/**
 	 * @return the billRefNo

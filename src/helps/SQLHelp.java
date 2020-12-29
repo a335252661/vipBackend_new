@@ -16,7 +16,7 @@ import java.util.*;
  */
 public class SQLHelp {
 
-    private static String fieldNameToPropName(String columnName) throws Exception {
+    public static String fieldNameToPropName(String columnName) throws Exception {
         StringBuffer propName = new StringBuffer();
         boolean upper = false;
         for (int i = 0; i < columnName.length(); i++) {
@@ -191,6 +191,7 @@ public class SQLHelp {
     }
 
     public static String querySQLReturnField(Connection conn, String sqlStr) {
+        System.out.println(sqlStr);
         PreparedStatement ps = null;
         ResultSet rs = null;
         String coun = "";
