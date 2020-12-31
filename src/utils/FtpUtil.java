@@ -312,6 +312,30 @@ public class FtpUtil {
 		}
 		return flag;
 	}
+
+	public boolean uploadFile2(File file){
+		String fileName = file.getName();
+		FileInputStream fis = null;
+		boolean flag = false;
+		try{
+			fis = new FileInputStream(file);
+			this.ftp.storeFile(fileName,fis);
+
+			if(StringUtils.isNotEmpty(this.getTempPath())) {
+				this.rename(fileName, this.path + fileName);
+			}
+			flag = true;
+		}catch(Exception ex){
+			ex.printStackTrace();
+		} finally {
+			try {
+				fis.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return flag;
+	}
 	
 	public boolean rename(String from, String to) {
 		try {
@@ -341,10 +365,10 @@ public class FtpUtil {
 			FtpUtil ftp = FtpUtil.connect("10.7.95.70","bgusr01","lc#v58iHH",
 					"/home/bgusr01/vip_backend/2.1new");
 //			ftp.downloadFile("vip.sh","C:\\Users\\Admin\\Desktop\\常用\\logs\\");
-			String[] fileNames = ftp.getFileNames();
-			System.out.println(fileNames.length);
-//			File file = new File("C:\\Users\\Admin\\Desktop\\ppp\\2.4\\MBI_AMOUNT_202003.021.001.001.001.62.txt");
-//			ftp.uploadFile(file,"MBI_AMOUNT_202003.021.001.001.001.62.txt");
+//			String[] fileNames = ftp.getFileNames();
+//			System.out.println(fileNames.length);
+			File file = new File("C:\\Users\\Admin\\Desktop\\ppp\\2.4\\MBI_AMOUNT_202003.021.001.001.001.62.txt");
+			ftp.uploadFile(file,"MBI_AMOUNT_202003.021.001.001.001.62.txt");
 
 			//腾讯云服务器 ftp
 //            FtpUtil ftp = FtpUtil.connect("106.54.46.37","ftpuser","cld7758258",

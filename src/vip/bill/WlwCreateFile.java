@@ -4,7 +4,11 @@ import helps.DateTimeHelp;
 import helps.FileHelp;
 import helps.TxtWriterHelp;
 import utils.DBConn;
+import utils.FtpUtil;
+import vip.IDCLoad.FileUtil;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -21,11 +25,11 @@ public class WlwCreateFile {
     private static String errLocation = "";
     static{
         if(sign.equals("pro")){
-            dirLocation = "/home/bgusr01/payment/JtBill/data/wlw/chk/";
-            errLocation = "/home/bgusr01/payment/JtBill/data/wlw/chk/orig/errFiles/";
+            dirLocation = "/acct/acct_payment/JtBill/data/wlw/chk/";
+            errLocation = "/acct/acct_payment/JtBill/data/wlw/chk/errFiles/";
         }else {
-            dirLocation = "C:\\Users\\Admin\\Desktop\\常用\\IDC-云提-物联网\\物联网\\WLWFILE\\";
-            errLocation = "C:\\Users\\Admin\\Desktop\\常用\\IDC-云提-物联网\\物联网\\WLWFILE\\err\\";
+            dirLocation = "D:\\file_temp\\wlw\\err\\";
+            errLocation = "D:\\file_temp\\wlw\\err\\11\\";
         }
     }
     public static void main(String[] args) {
@@ -45,6 +49,21 @@ public class WlwCreateFile {
             TxtWriterHelp.writeMsg("END,");
             TxtWriterHelp.close();
         }
+        //获取文件推送到70
+        try {
+            FtpUtil ftp = FtpUtil.connect("10.7.95.70","bgusr01","lc#v58iHH",
+                    "/home/bgusr01/payment/JtBill/data/wlw/chk/orig/errFiles");
+            ArrayList<String> currentFileAllLocation = FileHelp.getCurrentFileAllLocation(errLocation);
+            for(String path : currentFileAllLocation){
+                File file = new File(path);
+                ftp.uploadFile2(file);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //删除文件
+        FileHelp.deleteAllFile(errLocation);
 
     }
 }
