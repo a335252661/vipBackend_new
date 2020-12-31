@@ -76,6 +76,20 @@ public class DBConn {
         }
         return conn;
     }
+    public static Connection getCopy235ProConn() {
+        String dbUrl = "jdbc:oracle:thin:@(DESCRIPTION =(ADDRESS = (PROTOCOL = TCP)(HOST = 10.145.132.243)(PORT = 1521))(ADDRESS = (PROTOCOL = TCP)(HOST = 10.145.132.244)(PORT = 1521))(ADDRESS = (PROTOCOL = TCP)(HOST = 10.145.132.235)(PORT = 1521))(CONNECT_DATA =(SERVER = DEDICATED)(SERVICE_NAME = ACCTDB_REP1)))";
+//        String dbUrl = "jdbc:oracle:thin:@10.145.132.235:1521:ACCTDB_REP1";
+        String dbUser = "acct_app";
+        String dbPwd = "g$N6FDS8";
+        Connection conn = null;
+        try {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            conn =  DriverManager.getConnection(dbUrl, dbUser, dbPwd);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return conn;
+    }
     public static Connection getCopyTestConn() {
         String dbUrl = "jdbc:oracle:thin:@10.145.248.200:1521:IAMZWDB";
         String dbUser = "acct_app";
@@ -152,6 +166,20 @@ public class DBConn {
         String dbUrl = "jdbc:oracle:thin:@10.145.196.101:1521:iamzwdb";
         String dbUser = "dbusr01";
         String dbPwd = "dbusr01123";
+        Connection conn = null;
+        try {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            conn =  DriverManager.getConnection(dbUrl, dbUser, dbPwd);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return conn;
+    }
+
+    public static Connection getDbusr06TestConn() {
+        String dbUrl = "jdbc:oracle:thin:@10.145.196.101:1521:iamzwdb";
+        String dbUser = "dbusr06";
+        String dbPwd = "dbusr06123";
         Connection conn = null;
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");

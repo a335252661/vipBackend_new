@@ -326,6 +326,25 @@ public class CreateDateStep3_ALL {
 
 
         System.out.println("=================================================");
+        SQLHelp.dropTable(conn07,"cld_temp_data_all_new");
+        String cp01 = "create table cld_temp_data_all_new as\n" +
+                "select * from cld_temp_data_all_new@to_iamzw";
+        try{
+            LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
+                    "备份到07开始开始"
+                    ,true);
+            ProcUtil.callProc(conn07,"sql_procedure",  new Object[]{cp01});
+            ProcUtil.callProc(conn07,"sql_procedure",  new Object[]{"grant all on cld_temp_data_all_new to public"});
+            LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
+                    "备份到07开始结束"
+                    ,true);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        System.out.println("=================================================");
+
+
 
     }
 
