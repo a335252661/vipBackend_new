@@ -144,7 +144,7 @@ public class HttpClientHelps {
 	 * @param json
 	 * @return
 	 */
-	public static JSONObject doJsonPost(String url, String json) {
+	public static JSONObject post(String url, String json) {
 		HttpPost post = new HttpPost(url);
 		JSONObject response = null;
 		try {

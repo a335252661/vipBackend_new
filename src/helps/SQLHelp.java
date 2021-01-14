@@ -1,5 +1,6 @@
 package helps;
 
+import Pro.ProcUtil;
 import oracle.jdbc.OracleTypes;
 import org.apache.commons.beanutils.BeanUtils;
 import utils.DBConn;
@@ -273,6 +274,31 @@ public class SQLHelp {
         DateTimeHelp.end();
     }
 
+    public static Boolean isNotExistOrEmpty(Connection conn, String tableName){
+        Boolean existTable = SQLHelp.isExistTable(conn, tableName);
+        if(existTable){ //表存在
+            Boolean emptyTable = SQLHelp.isEmptyTable(conn, tableName);
+            if(emptyTable){
+                return true;
+            }else {
+                return false;
+            }
+        }else { //表不存在
+            return false;
+        }
+    }
+
+    public static Boolean isEmptyTable(Connection conn, String tableName) {
+        String query = "select count(1) as  FIELD from " +tableName +"where rownum <2";
+        String s = SQLHelp.querySQLReturnField(conn, query);
+        if(s.equals("0")){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+
     public static Boolean isExistTable(Connection conn, String tableName) {
         String sql = "select count(*) coun from user_tables where table_name =upper('" + tableName + "')";
         Statement state = null;
@@ -312,6 +338,14 @@ public class SQLHelp {
         if (existTable) {
             SQLHelp.deleteSQL(conn, "drop table " + tableName +" purge");
             System.out.println(tableName +" 存在，删除成功！");
+        }
+    }
+
+    public static void truncate(Connection conn, String tableName) {
+        Boolean existTable = SQLHelp.isExistTable(conn, tableName);
+        if (existTable) {
+            SQLHelp.exec(conn, "truncate table " + tableName );
+            System.out.println(tableName +" 数据，删除成功！");
         }
     }
 
@@ -423,6 +457,15 @@ public class SQLHelp {
             e.printStackTrace();
         }
         return cols;
+    }
+
+
+    public static void exec(Connection conn, String str) {
+        try{
+            ProcUtil.callProc(conn,"sql_procedure",  new Object[]{str});
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {

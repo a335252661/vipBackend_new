@@ -20,8 +20,12 @@ import java.util.Date;
  */
 public class cld {
     public static void main(String[] args) throws Exception {
-        String result = execCmd("java -version", null);
-        System.out.println(result);
+//        String result = execCmd("java -version", null);
+//        System.out.println(result);
+
+        String mm="2021-01-11 10:38:53.0";
+        System.out.println(mm.substring(0,mm.length()-2));
+
     }
 
 

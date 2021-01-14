@@ -144,4 +144,37 @@ public class TxtWriterHelp {
         TxtWriterHelp.close();
 
     }
+
+    private static void replaceTxtFirstLineByStr(String path, String replaceStr) throws Exception {
+        String temp = "";
+        try {
+            File file = new File(path);
+            FileInputStream fis = new FileInputStream(file);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+            StringBuffer buf = new StringBuffer();
+//要替换第一行，所以先读取第一行
+            String firstLineStr = br.readLine();
+// 将内容插入
+            buf = buf.append(replaceStr);
+// 保存该行后面的内容
+            while ((temp = br.readLine()) != null) {
+                buf = buf.append(System.getProperty("line.separator"));
+                buf = buf.append(temp);
+            }
+            br.close();
+            isr.close();
+            fis.close();
+            FileOutputStream fos = new FileOutputStream(file);
+            PrintWriter pw = new PrintWriter(fos);
+            pw.write(buf.toString().toCharArray());
+            pw.flush();
+            pw.close();
+            fos.close();
+        } catch (IOException e) {
+
+            throw new Exception();
+        }
+    }
+
 }

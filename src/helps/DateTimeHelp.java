@@ -155,5 +155,27 @@ public class DateTimeHelp {
     }
 
 
+    public static Date getMonthFirstDay() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.add(Calendar.MONTH, 0);
+        return calendar.getTime();
+    }
+    public static Date getMonthLastDay(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.set(Calendar.DAY_OF_MONTH,0);
+        calendar.add(Calendar.MONTH,1);
+        return calendar.getTime();
+    }
+    public static Date getNextMonthFirstDay(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.set(Calendar.DAY_OF_MONTH,1);
+        calendar.add(Calendar.MONTH,1);
+        return calendar.getTime();
+    }
+
 
 }

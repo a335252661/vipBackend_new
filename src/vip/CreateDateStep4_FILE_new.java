@@ -1,8 +1,13 @@
 package vip;
 
 
-import helps.*;
-import utils.*;
+import helps.DateTimeHelp;
+import helps.LogHelp;
+import helps.SQLHelp;
+import helps.TxtWriterHelp;
+import utils.DBConn;
+import utils.UtilTools;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -20,7 +25,7 @@ import java.util.*;
  * @Description TODO
  * @date 2019/11/18
  */
-public class CreateDateStep4_FILE {
+public class CreateDateStep4_FILE_new {
 
 //            private static String sign = "test";
     private static String sign = "pro";
@@ -39,13 +44,10 @@ public class CreateDateStep4_FILE {
 
     static{
         if(sign.equals("pro")){
-            iamConn = DBConn.getDbusr07ProConn();
-//            iamConn = DBConn.getBssConn();
-//            dirLocation = "/home/bgusr01/vip_backend/2.1new/";
-            finaDir = "/home/bgusr01/vip_backend/files/";
-
-            dirLocation =  "/acct/acct_other/vip_backend/2.1new/";
-
+//            iamConn = DBConn.getDbusr07ProConn();
+            iamConn = DBConn.getBssConn();
+            dirLocation = "/home/bgusr01/vip_backend/2.1new/";
+//            finaDir = "/home/bgusr01/vip_backend/files/";
             limitTol = 100000L;
         }else {
             iamConn = DBConn.getCopyTestConn();
@@ -84,12 +86,12 @@ public class CreateDateStep4_FILE {
 
 
     public static void main(String[] args) {
-
+        dirLocation = dirLocation+args[0]+"/";
         long startTime = System.currentTimeMillis(); //获取开始时间
 
         System.out.println("程序加载开始=========================="+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) );
         System.out.println("文件存放位置==========================" + dirLocation);
-        CreateDateStep4_FILE getData = new CreateDateStep4_FILE();
+        CreateDateStep4_FILE_new getData = new CreateDateStep4_FILE_new();
 
         //文件名时间为当前月份减一个月
         Date date = new Date();//获取当前时间 ? ?
@@ -135,7 +137,7 @@ public class CreateDateStep4_FILE {
             long startTime2 = System.currentTimeMillis(); //获取开始时间
             //获取数据
             System.out.println("查询数据开始");
-            ResultSet resultSet = getData.getData();
+            ResultSet resultSet = getData.getData(args[0]);
 
             long endTime2 = System.currentTimeMillis(); //获取结束时间
             String runTime2 = UtilTools.longToTime(endTime2 - startTime2);
@@ -197,73 +199,73 @@ public class CreateDateStep4_FILE {
             }
 
 
-            ArrayList<String> newNameList = new ArrayList<String>();
-
-            //所有文件生成完成，修改文件名
-            if (fileNameList.size() > 1) {
-                //获取最后一个文件
-                String maxName = fileNameList.get(fileNameList.size() - 1);
-                String max = maxName.split("\\.")[4];
-                int maxInteger = Integer.parseInt(max);
-
-
-                System.out.println("要生成" + (maxInteger+1) + "个文件");
-
-                //要生成多少批次文件
-                int picinum = maxInteger / size2 + (maxInteger % size2 == 0 ? 0 : 1);
-                System.out.println("要生成" + picinum + "个批次，每个批次最大数量999");
-
-
-                for (String currName : fileNameList) {
-
-                    String curr0 = currName.split("\\.")[0];
-                    String curr1 = currName.split("\\.")[1];
-                    //pici
-                    String curr2 = currName.split("\\.")[2];
-                    //最大
-                    String curr3 = currName.split("\\.")[3];
-                    //当前是第几个文件
-                    int curr4 =Integer.parseInt( currName.split("\\.")[4]);
-                    //结尾
-                    String curr5 = currName.split("\\.")[5];
-                    String picin ="";
-                    int num=0;
-
-
-                    //判断当前是第几批次
-                    int currpici = curr4 / size2 + (curr4 % size2 == 0 ? 0 : 1);
-                    if(currpici < picinum){
-                        num = size2;
-                        picin = UtilTools.zeroPadding(currpici);
-                        curr4 = curr4-size2*(currpici-1);
-                    }else {
-                        //表示最后一个批次
-                        picin = UtilTools.zeroPadding(currpici);
-                        num = maxInteger-size2*(currpici-1);
-                        curr4 = curr4-size2*(currpici-1);
-                    }
-
-                    String curr4str = UtilTools.zeroPadding(curr4);
-                    String maxNum= UtilTools.zeroPadding(num);
-                    String newName = curr0 +"."+curr1+picin+maxNum +curr4str +"."+curr5;
-                    UtilTools.renameFile(dirLocation, currName, newName);
-
-                    newNameList.add(newName);
-
-                }
-            }
-
-
-            String checkName = "MBI_"+sys_datetime+".021.001.000.000.000."+UtilTools.makeFF()+".CHECK";
-            TxtWriterHelp.createFile(dirLocation, checkName,null);
-            if(newNameList.size()>0){
-                for(String name : newNameList){
-                    TxtWriterHelp.writeMsg(name+"|M");
-                }
-            }
-            TxtWriterHelp.close();
-            System.out.println("check 文件生成完成");
-
+//            ArrayList<String> newNameList = new ArrayList<String>();
+//
+//            //所有文件生成完成，修改文件名
+//            if (fileNameList.size() > 1) {
+//                //获取最后一个文件
+//                String maxName = fileNameList.get(fileNameList.size() - 1);
+//                String max = maxName.split("\\.")[4];
+//                int maxInteger = Integer.parseInt(max);
+//
+//
+//                System.out.println("要生成" + (maxInteger+1) + "个文件");
+//
+//                //要生成多少批次文件
+//                int picinum = maxInteger / size2 + (maxInteger % size2 == 0 ? 0 : 1);
+//                System.out.println("要生成" + picinum + "个批次，每个批次最大数量999");
+//
+//
+//                for (String currName : fileNameList) {
+//
+//                    String curr0 = currName.split("\\.")[0];
+//                    String curr1 = currName.split("\\.")[1];
+//                    //pici
+//                    String curr2 = currName.split("\\.")[2];
+//                    //最大
+//                    String curr3 = currName.split("\\.")[3];
+//                    //当前是第几个文件
+//                    int curr4 =Integer.parseInt( currName.split("\\.")[4]);
+//                    //结尾
+//                    String curr5 = currName.split("\\.")[5];
+//                    String picin ="";
+//                    int num=0;
+//
+//
+//                    //判断当前是第几批次
+//                    int currpici = curr4 / size2 + (curr4 % size2 == 0 ? 0 : 1);
+//                    if(currpici < picinum){
+//                        num = size2;
+//                        picin = UtilTools.zeroPadding(currpici);
+//                        curr4 = curr4-size2*(currpici-1);
+//                    }else {
+//                        //表示最后一个批次
+//                        picin = UtilTools.zeroPadding(currpici);
+//                        num = maxInteger-size2*(currpici-1);
+//                        curr4 = curr4-size2*(currpici-1);
+//                    }
+//
+//                    String curr4str = UtilTools.zeroPadding(curr4);
+//                    String maxNum= UtilTools.zeroPadding(num);
+//                    String newName = curr0 +"."+curr1+picin+maxNum +curr4str +"."+curr5;
+//                    UtilTools.renameFile(dirLocation, currName, newName);
+//
+//                    newNameList.add(newName);
+//
+//                }
+//            }
+//
+//
+//            String checkName = "MBI_"+sys_datetime+".021.001.000.000.000."+UtilTools.makeFF()+".CHECK";
+//            TxtWriterHelp.createFile(dirLocation, checkName,null);
+//            if(newNameList.size()>0){
+//                for(String name : newNameList){
+//                    TxtWriterHelp.writeMsg(name+"|M");
+//                }
+//            }
+//            TxtWriterHelp.close();
+//            System.out.println("check 文件生成完成");
+//
 
 
             long endTime = System.currentTimeMillis(); //获取结束时间
@@ -413,9 +415,9 @@ public class CreateDateStep4_FILE {
     }
 
 
-    public ResultSet getData() throws Exception {
+    public ResultSet getData(String arg) throws Exception {
 
-       String sql = "select * from cld_temp_data_all_new";
+       String sql = "select * from MBI_202101 where  mod(acct_id , 15)='"+arg+"'";
 //       String sql = "select * from MBI_202101";
 
         String sqltest = "select * from dbusr07.cld_temp_data_zq@zwdb_prod";

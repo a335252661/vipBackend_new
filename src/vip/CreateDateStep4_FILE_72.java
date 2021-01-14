@@ -1,8 +1,13 @@
 package vip;
 
 
-import helps.*;
-import utils.*;
+import helps.DateTimeHelp;
+import helps.LogHelp;
+import helps.SQLHelp;
+import helps.TxtWriterHelp;
+import utils.DBConn;
+import utils.UtilTools;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -20,7 +25,7 @@ import java.util.*;
  * @Description TODO
  * @date 2019/11/18
  */
-public class CreateDateStep4_FILE {
+public class CreateDateStep4_FILE_72 {
 
 //            private static String sign = "test";
     private static String sign = "pro";
@@ -40,12 +45,7 @@ public class CreateDateStep4_FILE {
     static{
         if(sign.equals("pro")){
             iamConn = DBConn.getDbusr07ProConn();
-//            iamConn = DBConn.getBssConn();
-//            dirLocation = "/home/bgusr01/vip_backend/2.1new/";
-            finaDir = "/home/bgusr01/vip_backend/files/";
-
-            dirLocation =  "/acct/acct_other/vip_backend/2.1new/";
-
+            dirLocation = "/home/ivr/vip_backend/2.1new/";
             limitTol = 100000L;
         }else {
             iamConn = DBConn.getCopyTestConn();
@@ -89,7 +89,7 @@ public class CreateDateStep4_FILE {
 
         System.out.println("程序加载开始=========================="+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) );
         System.out.println("文件存放位置==========================" + dirLocation);
-        CreateDateStep4_FILE getData = new CreateDateStep4_FILE();
+        CreateDateStep4_FILE_72 getData = new CreateDateStep4_FILE_72();
 
         //文件名时间为当前月份减一个月
         Date date = new Date();//获取当前时间 ? ?
