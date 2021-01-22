@@ -37,7 +37,7 @@ public class BackupInvoice {
         String yyyyMMdd = DateTimeHelp.dateToStr(DateTimeHelp.getMonthFirstDay(), "yyyyMMdd");
         //存在则删除
         SQLHelp.truncate(conncp,BILL_INVOICE_DETAIL);
-        String cc="insert into "+BILL_INVOICE_DETAIL+" as select * from BILL_INVOICE_DETAIL PARTITION(P_BID_"+yyyyMM+")";
+        String cc="insert into "+BILL_INVOICE_DETAIL+"  select * from BILL_INVOICE_DETAIL PARTITION(P_BID_"+yyyyMM+")";
         try{
             ProcUtil.callProc(conncp,"sql_procedure",  new Object[]{cc});
         }catch (Exception e){
@@ -47,7 +47,7 @@ public class BackupInvoice {
 
 
         SQLHelp.truncate(conncp,BILL_INVOICE);
-        String mm="insert into "+BILL_INVOICE+" as select * from BILL_INVOICE where billing_cycle_id='"+yyyyMMdd+"'";
+        String mm="insert into "+BILL_INVOICE+"  select * from BILL_INVOICE where billing_cycle_id='"+yyyyMMdd+"'";
         try{
             ProcUtil.callProc(conncp,"sql_procedure",  new Object[]{mm});
         }catch (Exception e){

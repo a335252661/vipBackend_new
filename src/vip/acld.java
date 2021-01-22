@@ -5,6 +5,8 @@ import helps.SQLHelp;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 
 /**
@@ -15,27 +17,12 @@ import java.util.HashSet;
  */
 public class acld {
     public static void main(String[] args) {
-//        System.out.println(StringUtils.isEmpty("null"));
-//
-//        HashSet<String> ll = new HashSet<String>();
-//        ll.add("1");
-//        ll.add("12");
-//        ll.add("1");
-//
-//        System.out.println(ll);
-//
-//
-//        String update = "update  JT_BILL_DATA_INVOICE set load_flag ='2' , CHG_DATE = sysdate where PAY_INTERIM_SEQ in (?)";
-//        String newSql = String.format(update.replace("?", "%s"), SQLHelp.toSQLin(ll.toArray()));
-//        System.out.println(newSql);
-//
-//        //"billMonth" : "2020-05-01 00:00:00.0",
-//        String str[] = "2020-05-01 00:00:00.0".toString().split("-");
-//        String mon = str[0].concat(str[1]);
-//        System.out.println(mon);
+        //获取上个月
+        Calendar instance = Calendar.getInstance();
+        instance.add(Calendar.MONTH , -1);
+        Date time = instance.getTime();
+        System.out.println(time);
 
-
-        CommonHelp.screenshot("D:\\file_temp" , "jeitu" , "jpg");
 
     }
 }

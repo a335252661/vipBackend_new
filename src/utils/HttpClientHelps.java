@@ -330,44 +330,10 @@ public class HttpClientHelps {
 
 
 	public static void main(String[] args) {
-		String url="http://10.145.220.57:8063/acct/acctdatabill/billInvoice/189013560472/87115123992";
-		com.alibaba.fastjson.JSONObject js= new com.alibaba.fastjson.JSONObject();
-		js.put("payMethod",12);
-//		HttpClientHelps.sendPatch(url, js.toJSONString());
-		HttpClientHelps.insertAndReturn(url, js.toJSONString());
-
-
-
-
-//		HttpClientHelps.insertAndReturn(url, js.toJSONString());
-//		Map dataMap = new HashMap();
-//		dataMap.put("balanceType","99");
-//		dataMap.put("requestTime",new Date());
-//		dataMap.put("destinationAttr",6);//分账
-//		dataMap.put("destinationAttrDetail",1);
-//		dataMap.put("destinationExpTime","20991231");
-//		dataMap.put("destinationId","ACMB8310100000089665");
-//		dataMap.put("objType","5BA"); //分账
-//		dataMap.put("operSystem","03");//(必填)发起操作系统(01:老UVC,02:付费易,03:空中充值,04:CRM(现金充值),05:电子代办,06:网厅,07:银联卡(IVR接入),11:CBS(余额转移))
-//		dataMap.put("organCode",898904);//(必填)网点编号
-//		dataMap.put("prolongDays",0);//(必填)充值延长有效期（天数）
-//		dataMap.put("rechargeAmount","20000");//(必填)充值金额，单位为分
-//		dataMap.put("rechargeFlag",0);
-//		dataMap.put("rechargeFlowAmount",null);//流量
-//		dataMap.put("rechargeUnit",0);
-//		dataMap.put("requestAmount",0);
-//		dataMap.put("secChannelCode","20");//(必填)二级渠道代码
-//		dataMap.put("tmpSn","seq11020304");//(必填)充值交易流水号(可同REQUEST_SEQ)
-//		dataMap.put("staffId",244033247435L);
-//		dataMap.put("noBillFlag",0);
-//		dataMap.put("payForm",0);
-//		dataMap.put("payChunnel",0);
-//		dataMap.put("channelId","0");
-//		dataMap.put("rechargeAccountType",0);
-//
-//		String url = "http://10.145.221.42:8263/acct/acctbizbalance/acctAsyncRecharge";
-//		HttpClientHelps.HttpClientPost(url, JSONObject.toJSONString(dataMap));
-
+		String url="http://10.145.205.69:9011/Ducc/userDataAuth";
+		String data = "{\"requestTime\":\"1\",\"requestId\":\"1\",\"inputNo\":\"18918582289\",\"queryType\":\"2\"}";
+		String s = HttpClientHelps.sendPost(url, data);
+		System.out.println(s);
 	}
 
 }

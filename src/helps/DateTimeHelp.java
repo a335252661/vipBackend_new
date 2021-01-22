@@ -177,5 +177,11 @@ public class DateTimeHelp {
         return calendar.getTime();
     }
 
+    public static Date getLastMonth(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH,-1);
+        return calendar.getTime();
+    }
+
 
 }

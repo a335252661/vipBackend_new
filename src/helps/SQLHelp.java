@@ -233,6 +233,19 @@ public class SQLHelp {
         DateTimeHelp.end();
     }
 
+    public static void insertSQLnoPrint(Connection conn, String sqlStr) {
+        try {
+            Statement statement = conn.createStatement();
+            statement.execute(sqlStr);
+            statement.close();
+            conn.commit();
+
+            statement.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void insertSQL(Connection conn, String sqlStr , Boolean println) {
         DateTimeHelp.start();
         try {

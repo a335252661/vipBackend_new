@@ -19,7 +19,7 @@ import java.util.Map;
 public class JTRepJdbcUtil {
 
 
-	public static Connection connnection = null;
+	public static Connection connnection = DBConn.getCopyProConn();
 
 	private static PreparedStatement preparedStatement = null;
 
@@ -72,7 +72,7 @@ public class JTRepJdbcUtil {
 
 	private static ResultSet executeQueryRS(String sql, Object[] params) {
 		try {
-			connnection = getConnection();
+			connnection = DBConn.getCopyProConn();;
 			preparedStatement = connnection.prepareStatement(sql);
 			if (params != null) {
 				for (int i = 0; i < params.length; i++) {

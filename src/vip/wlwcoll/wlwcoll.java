@@ -28,7 +28,7 @@ public class wlwcoll {
 
     private static DecimalFormat df2 = new DecimalFormat("000");
 
-    private String jtBillIotAcctItemAccount_filepath = "/acct/acct_payment/JtBill/data/wlw/coll/test/";
+    private String jtBillIotAcctItemAccount_filepath = "/acct/acct_payment/JtBill/data/wlw/coll/";
 
     private  static    Connection conn = DBConn.getCopyProConn();;
 

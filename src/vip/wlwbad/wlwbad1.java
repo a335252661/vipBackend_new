@@ -1,7 +1,6 @@
 package vip.wlwbad;
 
 import helps.DateTimeHelp;
-import helps.FileHelp;
 import helps.SQLHelp;
 import utils.DBConn;
 import utils.UtilTools;
@@ -9,7 +8,6 @@ import utils.UtilTools;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,7 +16,7 @@ import java.util.List;
  * @Description TODO
  * @date 2020/9/10
  */
-public class wlwbad2 extends Thread{
+public class wlwbad1 extends Thread{
     private static String sign = "test";
     //    private static String sign = "pro";
     private static String dirLocation = "";
@@ -42,14 +40,12 @@ public class wlwbad2 extends Thread{
 
     private static    ResultSet resultSet = null;
     private static   List<String> columnNameList = null;
-    private static wlwbad2 shishouCreateFile= null;
+    private static wlwbad1 shishouCreateFile= null;
 
 
     //当前文件名
     private static String currentFileName ;
     private static Long allcount ;
-
-    private static   List<String> fileNameList = new ArrayList<String>();
 
     static {
         if (sign.equals("pro")) {
@@ -60,9 +56,9 @@ public class wlwbad2 extends Thread{
             limitTol = 100000L;
         } else {
             iamConn = DBConn.getCollTestConn();
-            dirLocation = "D:\\file_temp\\CreateFileHelp2\\";
+            dirLocation = "D:\\file_temp\\CreateFileHelp\\";
             finaDir = "D:\\bgusr01\\vip_backend\\files\\";
-            limitTol = 1000L;
+            limitTol = 100000L;
         }
     }
 
@@ -72,43 +68,56 @@ public class wlwbad2 extends Thread{
 
 
 
-        SQLHelp.dropTable(iamConn,"coll_bill_ref_no2");
-            String st1 = "create table coll_bill_ref_no2 as\n" +
+        SQLHelp.dropTable(iamConn,"coll_bill_ref_no");
+        if(MM.equals("01")){
+            String st1 = "create table coll_bill_ref_no as\n" +
                     "select distinct bill_ref_no from coll_revoke_invoices@cq where revoke_flag=2\n";
             SQLHelp.exec(iamConn , st1);
+        }else {
+            String st1 = "create table coll_bill_ref_no as\n" +
+                    "select distinct bill_ref_no from coll_revoke_invoices@cq where revoke_flag=2 and to_char(closed_date,'yyyymm') = to_char(add_months(sysdate,-1),'yyyymm')\n";
+            SQLHelp.exec(iamConn , st1);
+        }
 
         ////  select * from coll_invoices@cq where revoke_flag=2 and closed_date is null
 ////  --296664
 //  select * from coll_revoke_invoices@cq  where revoke_flag=2  and to_char(closed_date,'yyyymm') = to_char(add_months(sysdate,-1),'yyyymm' )
 
 
-        SQLHelp.dropTable(iamConn,"coll_pay_interim_seq2");
-        String st2 = "create table coll_pay_interim_seq2 as\n" +
-                "select a.seq from pay_interim_bill@to_iamzw_new a,coll_bill_ref_no2 b where a.bill_ref_no = b.bill_ref_no\n";
+        SQLHelp.dropTable(iamConn,"coll_pay_interim_seq");
+        String st2 = "create table coll_pay_interim_seq as\n" +
+                "select a.seq from pay_interim_bill@to_iamzw_new a,coll_bill_ref_no b where a.bill_ref_no = b.bill_ref_no\n";
         SQLHelp.exec(iamConn , st2);
 
-        SQLHelp.dropTable(iamConn,"coll_result2");
-        String st3 = "create table coll_result2 as \n" +
-                "        select serv_id, acct_id, billing_month, amount\n" +
-                "       from (select a.serv_id,\n" +
-                "                    a.acct_id,\n" +
-                "                    a.billing_month,\n" +
-                "                    sum(a.amount) as amount\n" +
-                "               from jt_bill_data@to_iamzw_new a, coll_pay_interim_seq2 b\n" +
-                "              where a.pay_interim_seq = b.seq\n" +
-                "              group by a.serv_id, a.acct_id, a.billing_month)";
+        SQLHelp.dropTable(iamConn,"coll_result");
+        String st3 = "create table coll_result as \n" +
+                "select --rownum as row1,\n" +
+                "       acct_id,\n" +
+                "       serv_id,\n" +
+                "       billing_month,\n" +
+                "       amount,\n" +
+                "       pro,\n" +
+                "       lpad(seq_coll_bad.nextval, 14, '0') xznum\n" +
+                "  from (select a.acct_id,\n" +
+                "               a.serv_id,\n" +
+                "               a.billing_month,\n" +
+                "               sum(a.amount) as amount,\n" +
+                "               '021' as pro\n" +
+                "          from jt_bill_data@to_iamzw_new a, coll_pay_interim_seq b\n" +
+                "         where a.pay_interim_seq = b.seq\n" +
+                "         group by a.acct_id, a.serv_id, a.billing_month, '021')";
         SQLHelp.exec(iamConn, st3);
 
-         allcount = Long.parseLong(SQLHelp.querySQLReturnField(iamConn, "select count(1) as FIELD from coll_result2"));
+         allcount = Long.parseLong(SQLHelp.querySQLReturnField(iamConn, "select count(1) as FIELD from coll_result"));
 
-         resultSet = SQLHelp.querySQLReturnResultSet(iamConn, "select * from coll_result2");
+         resultSet = SQLHelp.querySQLReturnResultSet(iamConn, "select * from coll_result");
         return resultSet;
     }
 
     public static void main(String[] args) {
         DateTimeHelp.start();
         try {
-            shishouCreateFile = new wlwbad2();
+            shishouCreateFile = new wlwbad1();
             //获取数据
             shishouCreateFile.getResultSet();
             columnNameList = SQLHelp.getColumnName(resultSet);
@@ -167,20 +176,6 @@ public class wlwbad2 extends Thread{
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-
-            //生成检验文件
-            try {
-                File existAndCreate = FileHelp.isExistAndCreate(dirLocation + "IOT_BADDEBT." + yyyyMMdd + "." + "000" + ".021");
-                pw = new PrintWriter(new FileOutputStream(existAndCreate));
-                for(String name : fileNameList){
-                    pw.println(name);
-                }
-                pw.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-
             DateTimeHelp.end();
         }
     }
@@ -201,8 +196,7 @@ public class wlwbad2 extends Thread{
     public void createFile() {
         try {
             String str = String.format("%03d", currentFileOrder);
-             currentFileName = "IOT_BADDEBT_" + yyyyMMdd + "." + str + ".021";
-            fileNameList.add(currentFileName);
+             currentFileName = "BILL2IOT.BADDEBT." + yyyyMMdd + "." + str + ".021";
             String location = dirLocation + currentFileName;
             //判断文件时候存在，不存在则创建
             UtilTools.judeFileExists(location);

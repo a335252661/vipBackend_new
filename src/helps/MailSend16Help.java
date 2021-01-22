@@ -95,8 +95,7 @@ public class MailSend16Help {
     }
 
     public static void main(String[] args) {
-        List<String> fileStrlist = Arrays.asList("F:\\Screenshots\\comparator比较器.jpg",
-                "F:\\Screenshots\\foreach输出.png" );
+        List<String> fileStrlist = Arrays.asList("D:\\file_temp\\11111\\BILL_IOT_ACCT_ITEM_20210115.021.001" );
         MailSend16Help.doSendHtmlEmail("邮件测试" ,
                 "内容：<h1>test,测试</h1>",
                 "chengliudegg@163.com",

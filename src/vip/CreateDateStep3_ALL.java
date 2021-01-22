@@ -50,19 +50,11 @@ public class CreateDateStep3_ALL {
                 " select \n" +
                 "/*+ USE_HASH(m u) */ \n" +
                 "msisdn,  serv_id , acct_id,sum(charge)charge \n" +
-                "from cld_temp_data_new  where rownum <100\n" +
+                "from cld_temp_data_new \n" +
                 "group by msisdn,serv_id , acct_id";
         SQLHelp.insertSQL(conn,create_cld_serv_acc);
         LogHelp.insertCldLogsPro(conn,project,"cld_serv_acc_new 创建成功" ,true);
 
-
-
-
-//        SQLHelp.truncate(conn,"account");
-//        String cc="insert into account \n" +
-//                "select  distinct acct_cd,acct_id,cust_id from cus.account@CRM_COPY";
-//        SQLHelp.insertSQL(conn,cc);
-//        System.out.println("备份结束");
 
 
         SQLHelp.truncate(conn,"cld_all_data_new");
@@ -74,7 +66,7 @@ public class CreateDateStep3_ALL {
                 "  ,c.cust_id as cust_id_new\n" +
                 "   from cld_serv_acc_new a left join  cus.prod_inst@CRM_COPY b  \n" +
                 " on a.msisdn = b.acc_num\n" +
-                " left join  account c  on c.acct_cd = to_char(a.acct_id) where rownum <100";
+                " left join  account c  on c.acct_cd = to_char(a.acct_id)";
         if(sign.equals("pro")){
         }else {
             //用于测试
@@ -134,7 +126,7 @@ public class CreateDateStep3_ALL {
                 "WHEN sum(charge) = 0 THEN  '01' --套内\n" +
                 "ELSE  '03'\n" +
                 "END MEAL_TYPE\n" +
-                "from cld_temp_data_new a  where rownum <100\n" +
+                "from cld_temp_data_new a  \n" +
                 "group by a.ACCT_ITEM_TYPE_ID ,\n" +
                 "a.msisdn,\n" +
                 "a.acct_id";
@@ -177,7 +169,7 @@ public class CreateDateStep3_ALL {
                         "               from cld_temp_data_new t left join cld_temp_meal m \n" +
                         "                            on t.msisdn = m.msisdn\n" +
                         "                          and t.ACCT_ITEM_TYPE_ID= m.ACCT_ITEM_TYPE_ID\n" +
-                        "                          and t.acct_id = m.acct_id where rownum <100";
+                        "                          and t.acct_id = m.acct_id ";
         SQLHelp.exec(conn,create_cld_temp_data4);
         System.out.println("cld_temp_data_meal=="+SQLHelp.querySQLReturnList2(conn,"select count(1),sum(charge) from cld_temp_data_meal"));
 
@@ -224,7 +216,7 @@ public class CreateDateStep3_ALL {
                 "on \n" +
                 "t.serv_id = c.serv_id\n" +
                 " and   t.acct_id = c.acct_id\n" +
-                "and   t.msisdn = c.msisdn where rownum <100";
+                "and   t.msisdn = c.msisdn ";
         SQLHelp.exec(conn,sql);
 
         ArrayList<String> quer = SQLHelp.querySQLReturnList2(conn,"select count(1),sum(charge) from cld_temp_data_all_new");

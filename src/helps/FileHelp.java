@@ -24,7 +24,7 @@ public class FileHelp {
         }
     }
 
-    private static File isExistAndCreate(String fullPath){
+    public static File isExistAndCreate(String fullPath){
 
         File file = null;
         try {
