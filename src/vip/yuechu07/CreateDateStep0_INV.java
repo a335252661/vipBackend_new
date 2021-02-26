@@ -1,8 +1,9 @@
-package vip;
+package vip.yuechu07;
 
 import helps.DateTimeHelp;
 import helps.SQLHelp;
 import utils.DBConn;
+
 import java.sql.Connection;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
@@ -14,71 +15,19 @@ import java.util.concurrent.Executors;
  * @Description 十个线程获取数据
  * @date 2020/4/10
  */
-public class CreateDateStep1_OCS implements Runnable{
+public class CreateDateStep0_INV implements Runnable{
 
     private String P_C_NUM;
 
-    public CreateDateStep1_OCS(String p_C_NUM) {
+    public CreateDateStep0_INV(String p_C_NUM) {
         P_C_NUM = p_C_NUM;
-    }
-
-    private String count = "";
-
-
-    public String fun() {
-        String yyyyMM = DateTimeHelp.dateToStr(new Date(), "yyyyMM");
-        String table = "select count(1) as FIELD from ocs_bill_invoice_detail           PARTITION(P_O_BD_"+yyyyMM+") ";
-        Connection conn = DBConn.getCopyProConn();
-        String s = SQLHelp.querySQLReturnField(conn, table);
-        return s;
-    }
-
-    public void queryOCS() {
-
-        String s = fun();
-
-        if (s.equals("0")){
-            try {
-                Thread.sleep(3600);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            queryOCS();
-
-        }else {
-            count = s;
-
-            try {
-                Thread.sleep(360);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            if(count.equals(fun())){
-                //继续向下执行
-
-            }else {
-                //还在录入数据
-                queryOCS();
-            }
-
-        }
-
     }
 
     public static void main(String[] args) {
 
-        //判断osc数据是否生产完成
-        new CreateDateStep1_OCS("1").queryOCS();
-
-
-
-
-
         ExecutorService exe = Executors.newCachedThreadPool();
         for (int i = 0; i < 20; i++) {
-            exe.execute(new CreateDateStep1_OCS(i+""));
+            exe.execute(new CreateDateStep0_INV(i+""));
         }
         exe.shutdown();
         while (true) {
@@ -88,25 +37,20 @@ public class CreateDateStep1_OCS implements Runnable{
             }
         }
 
-
-
-
-
     }
 
 
     @Override
     public void run() {
-        System.out.println(P_C_NUM+" : CLD_TEMP_DATA_OCS 操作开始");
+        System.out.println(P_C_NUM+" : CLD_TEMP_DATA_NEW 操作开始");
 
         String MM = DateTimeHelp.dateToStr(new Date(), "MM");
-        String yyyyMM = DateTimeHelp.dateToStr(new Date(), "yyyyMM");
 
 
-        Connection conn = DBConn.getCopyProConn();
+        Connection conn = DBConn.getDbusr07ProConn();
 //        SQLHelp.truncate(conn, "CLD_TEMP_DATA_OCS");
 
-        String insert =  "insert into CLD_TEMP_DATA_OCS\n" +
+        String insert = "insert into CLD_TEMP_DATA_NEW\n" +
                 "select /*+ USE_HASH(m u) */\n" +
                 " c.user_id MSISDN,\n" +
                 " c.subscr_no SERV_ID,\n" +
@@ -158,7 +102,7 @@ public class CreateDateStep1_OCS implements Runnable{
                 " ' ' RESERVER3,\n" +
                 " ' ' RESERVER4,\n" +
                 " ' ' RESERVER5\n" +
-                "  from ocs_bill_invoice_detail           PARTITION(P_O_BD_"+yyyyMM+") c,\n" +
+                "  from BILL_INVOICE_DETAIL_"+MM+"           c,--十一月抛数据就是用十一月分区  P_BID_202011\n" +
                 "       bill_invoice_"+MM+"                  M,\n" +
                 "       TB_BIL_ACCT_ITEM_TYPE@hss T ,\n" +
                 "       ABP_QUERY.TEMPFY_OFFER_REL_1216@hss H\n" +
@@ -171,7 +115,7 @@ public class CreateDateStep1_OCS implements Runnable{
                 "   and mod(m.acct_id,20)="+P_C_NUM;
 
         SQLHelp.insertSQLnoPrint(conn, insert);
-        System.out.println(P_C_NUM+" : CLD_TEMP_DATA_OCS 操作结束");
+        System.out.println(P_C_NUM+" : CLD_TEMP_DATA_NEW 操作结束");
 
     }
 }

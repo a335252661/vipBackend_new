@@ -1,14 +1,13 @@
-package vip;
+package vip.yuechu07;
 
-import Pro.ProcUtil;
 import helps.DateTimeHelp;
 import helps.LogHelp;
 import helps.SQLHelp;
+import org.apache.commons.lang.StringUtils;
 import utils.DBConn;
 
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * @author 程刘德
@@ -25,9 +24,9 @@ public class CreateDateStep2_ADD {
     private static Connection conn = null;
     static{
         if(sign.equals("pro")){
-            conn = DBConn.getCopyProConn();
+            conn = DBConn.getDbusr07ProConn();
         }else {
-            conn = DBConn.getCopyTestConn();
+            conn = DBConn.getDbusr07TestConn();
         }
     }
 
@@ -35,35 +34,38 @@ public class CreateDateStep2_ADD {
 
         //删除
         String yyyyMM = DateTimeHelp.getDateTimeString("yyyyMM");
-        String delete2 = "delete cld_temp_data_new_temp02 where billing_cycle_id ='"+yyyyMM+"' ";
+        String delete2 = "delete cld_temp_data_new where billing_cycle_id ='"+yyyyMM+"' ";
         SQLHelp.deleteSQL(conn,delete2);
 
         LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
-                "在 cld_temp_data_new_temp02 删除"+yyyyMM+"账期数据完成"
+                "在 cld_temp_data_new 删除"+yyyyMM+"账期数据完成"
                 ,true);
 
 
-        ArrayList<String> cld_temp_data_new_temp02_list = SQLHelp.querySQLReturnList2(conn, "select count(1) coun , sum(charge) charge from cld_temp_data_new_temp02");
-        String count1 = cld_temp_data_new_temp02_list.get(0)==null?"0":cld_temp_data_new_temp02_list.get(0);
-        String sum1 = cld_temp_data_new_temp02_list.get(1)==null?"0":cld_temp_data_new_temp02_list.get(1);
+        ArrayList<String> cld_temp_data_new_list = SQLHelp.querySQLReturnList2(conn, "select count(1) coun , sum(charge) charge from cld_temp_data_new");
+        String count1 = StringUtils.isEmpty(cld_temp_data_new_list.get(0))?"0":cld_temp_data_new_list.get(0);
+        String sum1 =StringUtils.isEmpty(cld_temp_data_new_list.get(1))?"0":cld_temp_data_new_list.get(1);
         LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
-                "基础cld_temp_data_new_temp02 ： "+cld_temp_data_new_temp02_list
+                "基础cld_temp_data_new ： "+cld_temp_data_new_list
                 ,true);
 
 
         ArrayList<String> cld_temp_data_last_list = SQLHelp.querySQLReturnList2(conn, "select count(1) coun , sum(charge) charge from cld_temp_data_last");
-        String count2 = cld_temp_data_last_list.get(0)==null?"0":cld_temp_data_last_list.get(0);
-        String sum2 = cld_temp_data_last_list.get(1)==null?"0":cld_temp_data_last_list.get(1);
+        String count2 = StringUtils.isEmpty(cld_temp_data_last_list.get(0))?"0":cld_temp_data_last_list.get(0);
+        String sum2 = StringUtils.isEmpty(cld_temp_data_last_list.get(1))?"0":cld_temp_data_last_list.get(1);
         LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
                 "基础cld_temp_data_last ： "+cld_temp_data_last_list
                 ,true);
 
         ArrayList<String> CLD_TEMP_DATA_OCS_list = SQLHelp.querySQLReturnList2(conn, "select count(1) coun , sum(charge) charge from CLD_TEMP_DATA_OCS");
-        String count3 = CLD_TEMP_DATA_OCS_list.get(0)==null?"0":CLD_TEMP_DATA_OCS_list.get(0);
-        String sum3 = CLD_TEMP_DATA_OCS_list.get(1)==null?"0":CLD_TEMP_DATA_OCS_list.get(1);;
+        String count3 = StringUtils.isEmpty(CLD_TEMP_DATA_OCS_list.get(0))?"0":CLD_TEMP_DATA_OCS_list.get(0);
+        String sum3 = StringUtils.isEmpty(CLD_TEMP_DATA_OCS_list.get(1))?"0":CLD_TEMP_DATA_OCS_list.get(1);;
         LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
                 "基础CLD_TEMP_DATA_OCS ： "+CLD_TEMP_DATA_OCS_list
                 ,true);
+
+
+
 
         //原数据统计
         Long allcount = Long.parseLong(count1)+Long.parseLong(count2)+Long.parseLong(count3);
@@ -77,10 +79,10 @@ public class CreateDateStep2_ADD {
 
 
         //将立即出账数据存入cld_temp_data 数据
-        String insert = "insert into cld_temp_data_new_temp02 select * from cld_temp_data_last";
+        String insert = "insert into cld_temp_data_new select * from cld_temp_data_last";
         SQLHelp.insertSQL(conn,insert);
         LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
-                "立即出账数据插入cld_temp_data_new_temp02完成"
+                "立即出账数据插入cld_temp_data_new完成"
                 ,true);
 
         //将ocs的数据插入cld_temp_data表
@@ -92,11 +94,11 @@ public class CreateDateStep2_ADD {
 
 
 
-        ArrayList<String> all = SQLHelp.querySQLReturnList2(conn, "select count(1) coun , sum(charge) charge from cld_temp_data_new_temp02");
+        ArrayList<String> all = SQLHelp.querySQLReturnList2(conn, "select count(1) coun , sum(charge) charge from cld_temp_data_new");
         String co = all.get(0);
         String cha = all.get(1);
         LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),
-                "数据汇总之后cld_temp_data_new_temp02 " +all
+                "数据汇总之后cld_temp_data_new " +all
                 ,true);
         if((allcount+"").equals(co)   && (allcharge+"").equals(cha)  ){
             LogHelp.insertCldLogsPro(conn,"月账-"+DateTimeHelp.getDateTimeString("yyyy-MM"),

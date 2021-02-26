@@ -59,17 +59,45 @@ public class CreateDateStep3_ALL_center {
 
 
 
-        SQLHelp.truncate(conn,"cld_all_data_new");
-        String create_cld_all_data = "  insert into  cld_all_data_new  \n" +
-                " select  /*+ USE_HASH(m u) */  \n" +
+//        SQLHelp.truncate(conn,"cld_all_data_new");
+//        String create_cld_all_data = "  insert into  cld_all_data_new  \n" +
+//                " select  /*+ USE_HASH(m u) */  \n" +
+//                "   a.msisdn , a.serv_id, a.acct_id ,a.charge\n" +
+//                "  ,b.prod_inst_id as msisdn_new\n" +
+//                "  ,c.acct_id as acct_id_new\n" +
+//                "  ,c.cust_id as cust_id_new\n" +
+//                "   from cld_serv_acc_new a left join  cus.prod_inst@CRM_COPY b  \n" +
+//                " on a.msisdn = b.acc_num\n" +
+//                " left join  account c  on c.acct_cd = to_char(a.acct_id)";
+//        SQLHelp.insertSQL(conn,create_cld_all_data);
+
+
+        SQLHelp.truncate(conn,"CLD_acct_id");
+        String CLD_acct_id = " insert into  CLD_acct_id \n" +
+                " select  /*+ USE_HASH(a c) */  \n" +
                 "   a.msisdn , a.serv_id, a.acct_id ,a.charge\n" +
-                "  ,b.prod_inst_id as msisdn_new\n" +
+                "  --,b.prod_inst_id as msisdn_new\n" +
                 "  ,c.acct_id as acct_id_new\n" +
                 "  ,c.cust_id as cust_id_new\n" +
-                "   from cld_serv_acc_new a left join  cus.prod_inst@CRM_COPY b  \n" +
-                " on a.msisdn = b.acc_num\n" +
-                " left join  account c  on c.acct_cd = to_char(a.acct_id)";
-        SQLHelp.insertSQL(conn,create_cld_all_data);
+                "   from CLD_SERV_ACC_NEW_var a \n" +
+                "   --left join  cus.prod_inst@CRM_COPY b  on a.msisdn = b.acc_num\n" +
+                " left join  account c  on c.acct_cd = to_char(a.acct_id)  ";
+        SQLHelp.exec(conn , CLD_acct_id);
+
+        SQLHelp.truncate(conn,"cld_all_data_new");
+        String cld_all_data_new = "   insert into cld_all_data_new\n" +
+                "     select /*+ USE_HASH(a b) */\n" +
+                "      a.msisdn,\n" +
+                "      a.serv_id,\n" +
+                "      a.acct_id,\n" +
+                "      a.charge,\n" +
+                "      b.prod_inst_id as msisdn_new,\n" +
+                "      a.acct_id_new,\n" +
+                "      a.cust_id_new\n" +
+                "       from CLD_acct_id a\n" +
+                "       left join prod_inst b\n" +
+                "         on a.msisdn = b.acc_num";
+        SQLHelp.exec(conn , cld_all_data_new);
 
         LogHelp.insertCldLogsPro(conn,project, "cld_all_data_new 创建成功",true);
 

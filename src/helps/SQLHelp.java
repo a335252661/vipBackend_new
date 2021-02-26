@@ -15,7 +15,7 @@ import java.util.*;
  * @Description TODO
  * @date 2020/4/10
  */
-public class SQLHelp {
+public class SQLHelp extends Thread{
 
     public static String fieldNameToPropName(String columnName) throws Exception {
         StringBuffer propName = new StringBuffer();
@@ -479,6 +479,54 @@ public class SQLHelp {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public static void executeBatch(Connection conn, String str,List<Object[]> list , int count) {
+        try {
+            if(null == list || list.size()==0){
+                return;
+            }
+            conn.setAutoCommit(false);
+            PreparedStatement ps = conn.prepareStatement(str);
+
+            int n = 0;
+            for(int i=0 ;i<list.size() ; i++){
+                //数据赋值
+                addBatch(ps,list.get(i));
+                n ++ ;
+                if (n == count) {
+                    ps.executeBatch();
+                    conn.commit();
+                    n = 0 ;
+                }
+            }
+
+            ps.executeBatch();
+            conn.commit();
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    private static void addBatch(PreparedStatement ps , Object[] object) {
+        int index = 0;
+        try {
+            for (int i = 0; i < object.length; i++) {
+                ps.setObject(++index, object[i]);
+            }
+            ps.addBatch();
+        } catch (Exception e) {
+           e.printStackTrace();
+        }
+    }
+
+
+    @Override
+    public void run() {
+
+
+
     }
 
     public static void main(String[] args) {

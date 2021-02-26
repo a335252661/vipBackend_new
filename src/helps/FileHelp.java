@@ -162,7 +162,7 @@ public class FileHelp {
             }
             File endFile=new File(endDirection+ File.separator+ startFile.getName());
             if (startFile.renameTo(endFile)) {
-                System.out.println("文件移动成功！目标路径：{"+endFile.getAbsolutePath()+"}");
+                System.out.println("文件："+fileFullPath+" 移动到 ： "+dirPath+" result  :  文件移动成功！目标路径：{"+endFile.getAbsolutePath()+"}");
             } else {
                 System.out.println("文件移动失败！起始路径：{"+startFile.getAbsolutePath()+"}");
             }

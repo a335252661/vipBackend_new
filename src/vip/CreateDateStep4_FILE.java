@@ -26,7 +26,6 @@ public class CreateDateStep4_FILE {
     private static String sign = "pro";
 
     private static String dirLocation = "";
-    private static String finaDir = "";
 
 
     //每个文件存放数据条数
@@ -40,17 +39,12 @@ public class CreateDateStep4_FILE {
     static{
         if(sign.equals("pro")){
             iamConn = DBConn.getDbusr07ProConn();
-//            iamConn = DBConn.getBssConn();
-//            dirLocation = "/home/bgusr01/vip_backend/2.1new/";
-            finaDir = "/home/bgusr01/vip_backend/files/";
-
-            dirLocation =  "/acct/acct_other/vip_backend/2.1new/";
-
+            dirLocation = "/home/bgusr01/vip_backend/2.1new/";
+//            dirLocation =  "/acct/acct_other/vip_backend/2.1new/";
             limitTol = 100000L;
         }else {
             iamConn = DBConn.getCopyTestConn();
             dirLocation = "D:\\bgusr01\\vip_backend\\2.1new\\";
-            finaDir = "D:\\bgusr01\\vip_backend\\files\\";
             limitTol = 10L;
         }
     }

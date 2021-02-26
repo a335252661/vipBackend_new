@@ -26,6 +26,12 @@ public class AllEntrances {
             System.out.println("数据汇总到cld_temp_data_new");
 
         }
+        if(ArrayUtils.contains(args, "2.5")){
+            //跑十个线程，存数据进入cld_temp_data_ocs , 并且将数据存入存数据进入cld_temp_data
+            CreateDateStep2_5_MEAL.main(null);
+            System.out.println("CreateDateStep2_5_MEAL");
+
+        }
         if(ArrayUtils.contains(args, "3")){
             //数据准备，生成最终表cld_temp_data_all
             CreateDateStep3_ALL.main(null);

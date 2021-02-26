@@ -82,6 +82,16 @@ public class LogHelp {
     }
 
 
+    public static void updateNoticeStatus(Connection conn , int id , int status) {
+        SQLHelp.updateSQL(conn , "update cld_notice set status = "+status+" where id = "+id);
+    }
+
+    public static int getNoticeStatus(Connection conn , int id) {
+        String s = SQLHelp.querySQLReturnField(conn, "select status as FIELD from cld_notice where id = " + id);
+        return Integer.parseInt(s);
+    }
+
+
     public static void main(String[] args) {
         Connection conn = DBConn.getDbusr07TestConn();
         LogHelp.insertCldLogsTest(conn,"月账test","测试shengc",true);

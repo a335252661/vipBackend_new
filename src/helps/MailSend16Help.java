@@ -95,10 +95,16 @@ public class MailSend16Help {
     }
 
     public static void main(String[] args) {
-        List<String> fileStrlist = Arrays.asList("D:\\file_temp\\11111\\BILL_IOT_ACCT_ITEM_20210115.021.001" );
+        List<String> fileStrlist = Arrays.asList("D:\\file_temp\\11111\\CRM2BILL.SUM.202101.005.021" );
         MailSend16Help.doSendHtmlEmail("邮件测试" ,
-                "内容：<h1>test,测试</h1>",
-                "chengliudegg@163.com",
+                "内容：<h1>test,测试</h1> " +
+                        "<p style=\"color: red\"> 你好 </p>"+
+                        "<p style=\"color: red\"> \u001B[34m2021-01-28 07:00:01 将要检测项总共有：180，LTS 9，流程引擎 15，日志 118，监控 38 </p>"+
+                        "<p style=\"color: red\"> \u001B[0m </p>"+
+                        "<p style=\"color: red\"> lts: </p>"+
+                        "<p style=\"color: red\"> 10.145.172.21  项目：zookeeper  命令：netstat -anlt | grep :9304 | grep \"LISTEN\"| wc -l  探测值： 0  目标值：1  ==> 检测结果：异常!! </p>"+
+                        "<p style=\"color: red\"> \u001B[0m </p>",
+                "chengliudegg@163.com,820120386@qq.com",
                 "chengliudegg@163.com,335252661@qq.com",
                 fileStrlist);
 

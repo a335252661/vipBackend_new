@@ -1,8 +1,9 @@
-package vip;
+package vip.yuechu07;
 
 import helps.DateTimeHelp;
 import helps.SQLHelp;
 import utils.DBConn;
+
 import java.sql.Connection;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
@@ -23,59 +24,7 @@ public class CreateDateStep1_OCS implements Runnable{
     }
 
     private String count = "";
-
-
-    public String fun() {
-        String yyyyMM = DateTimeHelp.dateToStr(new Date(), "yyyyMM");
-        String table = "select count(1) as FIELD from ocs_bill_invoice_detail           PARTITION(P_O_BD_"+yyyyMM+") ";
-        Connection conn = DBConn.getCopyProConn();
-        String s = SQLHelp.querySQLReturnField(conn, table);
-        return s;
-    }
-
-    public void queryOCS() {
-
-        String s = fun();
-
-        if (s.equals("0")){
-            try {
-                Thread.sleep(3600);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            queryOCS();
-
-        }else {
-            count = s;
-
-            try {
-                Thread.sleep(360);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            if(count.equals(fun())){
-                //继续向下执行
-
-            }else {
-                //还在录入数据
-                queryOCS();
-            }
-
-        }
-
-    }
-
     public static void main(String[] args) {
-
-        //判断osc数据是否生产完成
-        new CreateDateStep1_OCS("1").queryOCS();
-
-
-
-
-
         ExecutorService exe = Executors.newCachedThreadPool();
         for (int i = 0; i < 20; i++) {
             exe.execute(new CreateDateStep1_OCS(i+""));
@@ -87,11 +36,6 @@ public class CreateDateStep1_OCS implements Runnable{
                 break;
             }
         }
-
-
-
-
-
     }
 
 
@@ -103,7 +47,7 @@ public class CreateDateStep1_OCS implements Runnable{
         String yyyyMM = DateTimeHelp.dateToStr(new Date(), "yyyyMM");
 
 
-        Connection conn = DBConn.getCopyProConn();
+        Connection conn = DBConn.getDbusr07ProConn();
 //        SQLHelp.truncate(conn, "CLD_TEMP_DATA_OCS");
 
         String insert =  "insert into CLD_TEMP_DATA_OCS\n" +
@@ -158,7 +102,7 @@ public class CreateDateStep1_OCS implements Runnable{
                 " ' ' RESERVER3,\n" +
                 " ' ' RESERVER4,\n" +
                 " ' ' RESERVER5\n" +
-                "  from ocs_bill_invoice_detail           PARTITION(P_O_BD_"+yyyyMM+") c,\n" +
+                "  from ocs_bill_current c,\n" +
                 "       bill_invoice_"+MM+"                  M,\n" +
                 "       TB_BIL_ACCT_ITEM_TYPE@hss T ,\n" +
                 "       ABP_QUERY.TEMPFY_OFFER_REL_1216@hss H\n" +

@@ -1,9 +1,11 @@
 package vip;
 
 import helps.CommonHelp;
+import helps.FileHelp;
 import helps.SQLHelp;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,11 +19,7 @@ import java.util.HashSet;
  */
 public class acld {
     public static void main(String[] args) {
-        //获取上个月
-        Calendar instance = Calendar.getInstance();
-        instance.add(Calendar.MONTH , -1);
-        Date time = instance.getTime();
-        System.out.println(time);
+        FileHelp.fileToDir("D:\\file_temp\\11111\\nblQianfei\\11.txt","D:\\file_temp\\11111\\nblQianfei\\temp");
 
 
     }

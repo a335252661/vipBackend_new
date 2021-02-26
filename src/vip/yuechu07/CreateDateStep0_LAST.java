@@ -1,122 +1,38 @@
-package vip;
+package vip.yuechu07;
 
 import helps.DateTimeHelp;
 import helps.SQLHelp;
 import utils.DBConn;
+
 import java.sql.Connection;
 import java.util.Date;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author 程刘德
  * @version 1.0
- * @Description 十个线程获取数据
+ * @Description  当前月份6  获取上一个月份分区5的数据  其中账期应该为当前月份6
  * @date 2020/4/10
  */
-public class CreateDateStep1_OCS implements Runnable{
+public class CreateDateStep0_LAST {
 
-    private String P_C_NUM;
-
-    public CreateDateStep1_OCS(String p_C_NUM) {
-        P_C_NUM = p_C_NUM;
-    }
-
-    private String count = "";
-
-
-    public String fun() {
-        String yyyyMM = DateTimeHelp.dateToStr(new Date(), "yyyyMM");
-        String table = "select count(1) as FIELD from ocs_bill_invoice_detail           PARTITION(P_O_BD_"+yyyyMM+") ";
-        Connection conn = DBConn.getCopyProConn();
-        String s = SQLHelp.querySQLReturnField(conn, table);
-        return s;
-    }
-
-    public void queryOCS() {
-
-        String s = fun();
-
-        if (s.equals("0")){
-            try {
-                Thread.sleep(3600);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            queryOCS();
-
-        }else {
-            count = s;
-
-            try {
-                Thread.sleep(360);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            if(count.equals(fun())){
-                //继续向下执行
-
-            }else {
-                //还在录入数据
-                queryOCS();
-            }
-
-        }
-
-    }
 
     public static void main(String[] args) {
-
-        //判断osc数据是否生产完成
-        new CreateDateStep1_OCS("1").queryOCS();
-
-
-
-
-
-        ExecutorService exe = Executors.newCachedThreadPool();
-        for (int i = 0; i < 20; i++) {
-            exe.execute(new CreateDateStep1_OCS(i+""));
-        }
-        exe.shutdown();
-        while (true) {
-            if (exe.isTerminated()) {
-                System.out.println("所有线程运行结束");
-                break;
-            }
-        }
-
-
-
-
-
-    }
-
-
-    @Override
-    public void run() {
-        System.out.println(P_C_NUM+" : CLD_TEMP_DATA_OCS 操作开始");
-
         String MM = DateTimeHelp.dateToStr(new Date(), "MM");
-        String yyyyMM = DateTimeHelp.dateToStr(new Date(), "yyyyMM");
+        String lasterMM = DateTimeHelp.dateToStr(DateTimeHelp.getLastMonth(), "MM");
 
+        Connection conn = DBConn.getDbusr07ProConn();
 
-        Connection conn = DBConn.getCopyProConn();
-//        SQLHelp.truncate(conn, "CLD_TEMP_DATA_OCS");
-
-        String insert =  "insert into CLD_TEMP_DATA_OCS\n" +
+        String insert = "INSERT INTO  CLD_TEMP_DATA_LAST\n" +
                 "select /*+ USE_HASH(m u) */\n" +
                 " c.user_id MSISDN,\n" +
                 " c.subscr_no SERV_ID,\n" +
-                " 11,\n" +
+                " 11 PRD_INST_ID,\n" +
                 " --n.prd_inst_id PROD_INST_ID,\n" +
                 " c.OFR_ID PRODUCT_OFFER_ID,\n" +
                 " nvl( H.EXT_OFFER_ID , H.offer_id ) PRODUCT_OFFER_ID_new,\n" +
                 " c.source_inst_id PRODUCT_OFFER_INST_ID,\n" +
                 " c.ACCOUNT_NO ACCT_ID,\n" +
-                " 11,\n" +
+                " 11 CUST_ID,\n" +
                 " --a.cust_cd CUST_ID,\n" +
                 " m.acct_id CRM_ACCT_ID,\n" +
                 " TO_CHAR(ADD_MONTHS(c.STATEMENT_DATE, -1), 'yyyymm') BILLING_CYCLE_ID,\n" +
@@ -158,8 +74,8 @@ public class CreateDateStep1_OCS implements Runnable{
                 " ' ' RESERVER3,\n" +
                 " ' ' RESERVER4,\n" +
                 " ' ' RESERVER5\n" +
-                "  from ocs_bill_invoice_detail           PARTITION(P_O_BD_"+yyyyMM+") c,\n" +
-                "       bill_invoice_"+MM+"                  M,\n" +
+                "  from BILL_INVOICE_DETAIL_"+lasterMM+"            c,-- 12月一号  ，使用 BILL_INVOICE_DETAIL_11   bill_invoice_12\n" +
+                "       bill_invoice_"+MM+"           M,\n" +
                 "       TB_BIL_ACCT_ITEM_TYPE@hss T ,\n" +
                 "       ABP_QUERY.TEMPFY_OFFER_REL_1216@hss H\n" +
                 " where M.BILL_REF_NO = c.BILL_REF_NO\n" +
@@ -167,11 +83,12 @@ public class CreateDateStep1_OCS implements Runnable{
                 "   and c.account_no = m.acct_id\n" +
                 "   and c.OFR_ID = H.ofr_id(+)\n" +
                 "   AND c.user_id not LIKE '%%|%%'\n" +
-                "   AND m.status_cd = 1\n" +
-                "   and mod(m.acct_id,20)="+P_C_NUM;
+                "   AND c.statement_date = trunc(sysdate,'MM')\n" +
+                "   AND m.status_cd = 1";
 
-        SQLHelp.insertSQLnoPrint(conn, insert);
-        System.out.println(P_C_NUM+" : CLD_TEMP_DATA_OCS 操作结束");
+        SQLHelp.insertSQL(conn, insert);
+        System.out.println("CLD_TEMP_DATA_LAST 操作结束");
 
     }
+
 }
