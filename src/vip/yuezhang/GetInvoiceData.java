@@ -22,12 +22,12 @@ public class GetInvoiceData {
     //            private static String sign = "test";
     private static String sign = "pro";
     //数据库连接
-    private static Connection conncp = null;
+    private static Connection conn07 = null;
     static{
         if(sign.equals("pro")){
-            conncp = DBConn.getCopyProConn();
+            conn07 = DBConn.getDbusr07ProConn();
         }else {
-            conncp = DBConn.getCopyTestConn();
+            conn07 = DBConn.getCopyTestConn();
         }
     }
     public static void main(String[] args) {
@@ -38,25 +38,25 @@ public class GetInvoiceData {
 
         //表是否存在  CLD_MSISDN_202101
         // cld_temp_data_all_new
-        Boolean isExist = SQLHelp.isExistTable(conncp, cld_msisdn);
+        Boolean isExist = SQLHelp.isExistTable(conn07, cld_msisdn);
         if(!isExist){ //不存在则新建
             String msisdn = " CREATE TABLE "+cld_msisdn+" AS\n" +
                     " SELECT DISTINCT MSISDN,acct_id FROM cld_temp_data_all_new";
-            SQLHelp.exec(conncp,msisdn);
+            SQLHelp.exec(conn07,msisdn);
         }
 
 
         //-3
-        SQLHelp.truncate(conncp,"cld_msisdn_center");
+        SQLHelp.truncate(conn07,"cld_msisdn_center");
         String daya3="insert into cld_msisdn_center \n" +
                 "select distinct a.msisdn from "+cld_msisdn+" a,"+BILL_INVOICE+" b where\n" +
                 "a.acct_id= b.acct_id and\n" +
                 " b.billing_cycle_id='"+yyyyMMdd+"' and b.status_cd=-3 and to_char(b.UPDATE_DATE,'yyyy/mm/dd')>='"+updatetime+"'\n" +
                 " ";
-        SQLHelp.exec(conncp,daya3);
+        SQLHelp.exec(conn07,daya3);
 
         //修改为负的金额
-        SQLHelp.truncate(conncp,"cld_temp_data_center");
+        SQLHelp.truncate(conn07,"cld_temp_data_center");
         String query = "insert into cld_temp_data_center  select a.MSISDN, \n" +
                 "a.SERV_ID, \n" +
                 "a.PRD_INST_ID, \n" +
@@ -85,14 +85,14 @@ public class GetInvoiceData {
                 "a.RESERVER3, \n" +
                 "a.RESERVER4, \n" +
                 "a.RESERVER5   from cld_temp_data_all_new a where a.msisdn in (select * from cld_msisdn_center)";
-        SQLHelp.exec(conncp,query);
+        SQLHelp.exec(conn07,query);
 
 
         /**
          * 第二部分
          */
         //删除
-        SQLHelp.truncate(conncp,"CLD_TEMP_DATA_NEW");
+        SQLHelp.truncate(conn07,"CLD_TEMP_DATA_NEW");
         String center="  insert into CLD_TEMP_DATA_NEW\n" +
                 "select /*+ USE_HASH(m u) */\n" +
                 " c.user_id MSISDN,\n" +
@@ -157,6 +157,6 @@ public class GetInvoiceData {
                 "   AND c.user_id not LIKE '%%|%%'\n" +
                 "   AND m.status_cd = 1\n" +
                 "   and to_char(M.create_date,'yyyy/mm/dd')>='"+updatetime+"'";
-        SQLHelp.exec(conncp,center);
+        SQLHelp.exec(conn07,center);
     }
 }

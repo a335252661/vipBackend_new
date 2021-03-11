@@ -38,8 +38,8 @@ public class Step2 {
 
         SQLHelp.updateSQL(conncp , up);
 
-        SQLHelp.dropTable(conncp,"bestpay_promotion_return_temp");
-        String temp_turn="        create table bestpay_promotion_return_temp as\n" +
+        SQLHelp.truncate(conncp,"bestpay_promotion_return_temp");
+        String temp_turn="insert into  bestpay_promotion_return_temp \n" +
                 "        select a.seq, a.account_no , a.status, a.statement_date, a.service_nbr,is_prepayment\n" +
                 "        from bestpay_promotion_return a\n" +
                 "        where (a.is_balance != 1 or a.is_balance is null)\n" +
