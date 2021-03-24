@@ -60,6 +60,18 @@ public class ShishouCreateFile {
     }
 
     public static void main(String[] args) {
+
+        String iot_bill_data = SQLHelp.queryTableCreateTime(iamConn, "JT_SHISHOU_RESULT");
+        String substring = iot_bill_data.substring(0, 10);
+        String timeString = DateTimeHelp.getDateTimeString("yyyy-MM-dd");
+        System.out.println("表创建时间： "+substring);
+        System.out.println("执行时间： "+timeString);
+        if(!substring.equals(timeString)){
+            System.out.println("时间不相等，不执行，直接退出： "+timeString);
+            return;
+        }
+
+
         DateTimeHelp.start();
         try {
            final ShishouCreateFile shishouCreateFile = new ShishouCreateFile();
