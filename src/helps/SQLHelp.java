@@ -521,6 +521,18 @@ public class SQLHelp extends Thread{
         }
     }
 
+    /**
+     *
+     * @param conn
+     * @param tableName
+     * @return 返回的时间格式 2018-11-05 15:00:29.0
+     */
+    public static String queryTableCreateTime(Connection conn, String tableName) {
+        String sql = "select created as FIELD from USER_OBJECTS  where object_name = '"+tableName.toUpperCase()+"'";
+        String s = SQLHelp.querySQLReturnField(conn, sql);
+        return s;
+    }
+
 
     @Override
     public void run() {
@@ -533,6 +545,13 @@ public class SQLHelp extends Thread{
         Connection collTestConn = DBConn.getDbusr01TestConn();
         String dumpInvoiceSql = "{call cld_test('4')}";
         SQLHelp.call(collTestConn, dumpInvoiceSql);
+
+        String iot_bill_data = SQLHelp.queryTableCreateTime(collTestConn, "IOT_BILL_DATA");
+        System.out.println(iot_bill_data.substring(0,10));
+
+        String timeString = DateTimeHelp.getDateTimeString("yyyy-MM-dd");
+        System.out.println(timeString);
+
     }
 
 }
