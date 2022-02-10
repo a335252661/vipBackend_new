@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class HttpClientHelps {
 
@@ -330,10 +331,16 @@ public class HttpClientHelps {
 
 
 	public static void main(String[] args) {
-		String url="http://10.145.205.69:9011/Ducc/userDataAuth";
-		String data = "{\"requestTime\":\"1\",\"requestId\":\"1\",\"inputNo\":\"18918582289\",\"queryType\":\"2\"}";
-		String s = HttpClientHelps.sendPost(url, data);
-		System.out.println(s);
+//		String url="http://10.145.205.69:9011/Ducc/userDataAuth";
+//		String data = "{\"requestTime\":\"1\",\"requestId\":\"1\",\"inputNo\":\"18918582289\",\"queryType\":\"2\"}";
+//		String s = HttpClientHelps.sendPost(url, data);
+//		System.out.println(s);
+//		HttpClientHelps.sendGet("192.168.22.62:32006/test/cld-dev/consumer-demo/echo-rest/22?test=1");
+		while (true){
+			try { TimeUnit.MILLISECONDS.sleep(300);  } catch (InterruptedException e) { e.printStackTrace(); }
+			HttpClientHelps.sendGet("http://192.168.22.62:32006/test/cld-dev/consumer-demo/echo-rest/22?test=1");
+		}
+
 	}
 
 }

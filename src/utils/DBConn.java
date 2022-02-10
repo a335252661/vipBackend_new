@@ -261,6 +261,22 @@ public class DBConn {
         return conn;
     }
 
+    public static Connection getLocalMySQLTestConn(String name) {
+        String dbUrl = "jdbc:mysql://localhost:3306/"+name+"?useUnicode=true&characterEncoding=UTF-8";
+        String dbUser = "root";
+        String dbPwd = "root";
+        Connection conn = null;
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            //MySQL 8.0 以上版本的数据库连接有所不同：
+//            Class.forName("com.mysql.cj.jdbc.Driver");
+            conn =  DriverManager.getConnection(dbUrl, dbUser, dbPwd);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return conn;
+    }
+
     public static Connection getCopyMySQLProConn() {
         String dbUrl = "jdbc:mysql://10.145.171.17:8331/ACCTDB?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&rewriteBatchedStatements=true";
         String dbUser = "acct_app";
